@@ -15,15 +15,29 @@ def fec_file(file, block_size, k, m):
 
 	#for the last round, block might be not complete or empty
 	index = 0
-	for i in range(block_count):
-		index = i % k
-		ds[index] = ds[index] + file.read(block_size)
+	results = []
+	results.extend([""] * m)
 
-	#add zeros to the end of stripes.
-	for i in range(index, k):
-		ds[i] = ds[i] + "\x00" * (len(ds[0]) - len(ds[i]))
+	for i in range(block_count / k):
+		for index in range(k):
+			ds[index] = file.read(block_size)
+		ds[k-1] = ds[k-1] + "\x00" * (block_size - len(ds[k-1]))
+		temp = fencoder.encode(ds)
+		for j in range(m):
+			results[j] = results[j] + temp[j]
 
-	results = fencoder.encode(ds)
+	if block_count % k == 0 :
+		return results
+
+	#the last round
+	for i in range(block_count % k):
+		ds[i] = file.read(block_size)
+	for index in range(i,k):
+		ds[index] = "\x00" * (len(ds[0]))
+	temp = fencoder.encode(ds)
+	for j in range(m):
+		results[j] = results[j] + temp[j]
+
 	return results
 
 def write_streams_to_file(streams, file_name_prefix = "temp_file"):
