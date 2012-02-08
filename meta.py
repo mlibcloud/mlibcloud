@@ -67,9 +67,10 @@ if __name__ == "__main__":
 	meta.set_stripe_location("s4", "S3")
 	print meta.save_to_string()
 	meta.save_to_file()	
+	
 
 	#Now load meta from the saved file.
 	ameta = FileMeta()
 	ameta.load_from_file("test_file.meta")
 	print meta.save_to_string()
-
+	print ameta["name"]
