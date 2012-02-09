@@ -8,7 +8,7 @@ from pyutil import mathutil
 
 
 def fdc_init(k,file_name_prefix = 'temp_file'):
-	file_dir_prefix = '/home/pin/桌面/' + file_name_prefix + '.'
+	file_dir_prefix = path.abspath('.') + file_name_prefix + '.'
 	parts = []
 	count = 0
 	part = 0
