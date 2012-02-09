@@ -18,7 +18,7 @@ def Fec_Upload(file_name,block_size,k,m,stripe_location):
 	print("fec file complete")
 	
 	'''meta
-	note: the number of stripe_location should be equal with m
+	note: the size of stripe_location should be equal with m
 	the content of stripe_location shoud be Storage providers'''
 	meta = FileMeta()
 	meta.set_name(file_name)
@@ -32,7 +32,7 @@ def Fec_Upload(file_name,block_size,k,m,stripe_location):
 	meta.save_to_file()
 	print("save meta complete")
 
-	'''threading upload'''
+	#threading upload
 	#different Sotrage Providers should have different mlibcloudid and mlibcloudkey
 	threads = [createThread(file_name + '.' + str(i),get_cloud_provider(stripe_location[i]),mlibcloudid,mlibcloudkey) for i in range(m)]
 	for it in threads :
@@ -40,7 +40,7 @@ def Fec_Upload(file_name,block_size,k,m,stripe_location):
 	for it in threads :
 		it.join()
 
-
+	#upload .meta to cloud
 	meta_location = set(stripe_location)
 	meta_threads = [createThread(file_name + '.meta',get_cloud_provider(i),mlibcloudid,mlibcloudkey) for i in meta_location]
 	for it in meta_threads :

@@ -1,5 +1,6 @@
 
 import os
+import threading
 from libcloud.storage.types import Provider
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerDoesNotExistError
@@ -19,7 +20,7 @@ class StorageDownloader :
 			print("%s container does not exist" % conName)
 			retObj = None
 		except ObjectDoesNotExistError :
-			print("%s object does not exist " %s objName)
+			print("%s object does not exist " % objName)
 			retObj = None
 		return retObj
 
@@ -32,6 +33,7 @@ class StorageDownloader :
 		
 		if objItem != None :
 			print("Downloading ... ")
+			print(dest_path)
 			return self.driver.download_object(objItem,dest_path,overwrite_existing,delete_on_failure)
 		else :
 			return False
@@ -40,14 +42,14 @@ class StorageDownloader :
 class createThread(threading.Thread,StorageDownloader) :
 	
 	def __init__(self,conName,objName,provider,Sid,Skey,dest_path = os.path.abspath('.')):
-		threading.Thread.__init__(self):
-		StorageDownloader.__init__(self,provider,UserId,UserKey)
+		threading.Thread.__init__(self)
+		StorageDownloader.__init__(self,provider,Sid,Skey)
 		self.conName = conName
 		self.objName = objName
 		self.dest_path = dest_path
 
 	def run(self):
-		result = self.doDownload(self.conName,self.objName,self.dest_path)
+		result = self.doDownload(self.conName,self.objName,dest_path = self.dest_path)
 		if result :
 			print("%s %s download success" %(self.conName,self.objName))
 		else :

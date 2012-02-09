@@ -7,11 +7,13 @@ from os import path
 from pyutil import mathutil
 
 
-def fdc_init(k,file_name_prefix = 'temp_file'):
-	file_dir_prefix = path.abspath('.') + file_name_prefix + '.'
+def fdc_init(k,file_dir,file_name_prefix = 'temp_file'):
+	file_dir_prefix = file_dir  + file_name_prefix + '.'
 	parts = []
 	count = 0
 	part = 0
+	#may cause while(1) looping
+	pass
 	while count < k :
 		while not path.isfile(file_dir_prefix + str(part)) :
 			part += 1
@@ -20,15 +22,15 @@ def fdc_init(k,file_name_prefix = 'temp_file'):
 		count += 1
 	return parts
 
-def fdc_file(block_size,k,m,file_name):
-	parts = fdc_init(k,file_name)
+def fdc_file(block_size,k,m,file_name,file_dir,file_size):
+	parts = fdc_init(k,file_dir,file_name)
 	fdecoder = Decoder(k,m)
 	streams = []
 	streams.extend([""] * k)
-	file = open(file_name,'w')
+	file = open(file_dir  + file_name,'w')
 
-	files = [ open(file_name + '.' + str(i),'r') for i in parts ]
-	file_size = path.getsize(file_name+'.'+str(parts[0]))	
+	files = [ open(file_dir  + file_name + '.' + str(i),'r') for i in parts ]
+#	file_size = path.getsize(file_name+'.'+str(parts[0]))	
 	block_count = mathutil.div_ceil(file_size,block_size)
 
 	for count in range(block_count) :
