@@ -1,3 +1,4 @@
+import md5
 from os import path
 from fec import fec_file
 from fec import write_streams_to_file
@@ -11,15 +12,15 @@ from provider_dict import get_cloud_provider
 
 def Fec_Upload(file_name,block_size,k,m,stripe_location):
 
-	'''fec_file'''
+	#fec_file
 	file = open(file_name,"r")
 	streams = fec_file(file,block_size,k,m)
 	write_streams_to_file(streams,file_name)
 	print("fec file complete")
 	
-	'''meta
-	note: the size of stripe_location should be equal with m
-	the content of stripe_location shoud be Storage providers'''
+	#generate .meta file
+	#note: the size of stripe_location should be equal with m
+	#the content of stripe_location shoud be Storage providers
 	meta = FileMeta()
 	meta.set_name(file_name)
 	meta.set_size(path.getsize(file_name))
@@ -28,6 +29,15 @@ def Fec_Upload(file_name,block_size,k,m,stripe_location):
 	meta.set_m(m)
 	for i in range(m):
 		meta.set_stripe_location("s" + str(i),stripe_location[i])
+
+
+	#generate md5 for stripes and .meta
+	for i in range(m):
+		file_it = open(file_name+'.'+str(i))
+		meta.set_md5("c"+str(i),md5.new(file_it.read()).hexdigest())
+	
+
+	meta.set_md5("cmeta",meta.cal_md5())
 	
 	meta.save_to_file()
 	print("save meta complete")

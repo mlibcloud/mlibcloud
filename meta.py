@@ -1,5 +1,6 @@
 from UserDict import UserDict
 import json
+import md5
 
 
 #information about a erasure code file
@@ -9,6 +10,7 @@ import json
 	#k
 	#m
 	#stripe location, meaning on which cloud it is saved
+	#md5
 
 class FileMeta(UserDict):
 	"store metadata of the erasure coded file blocks"
@@ -51,6 +53,26 @@ class FileMeta(UserDict):
 	def set_stripe_location(self, sx, cloud_provider):
 		#sx must be between s0 and sm
 		self[sx] = cloud_provider
+	def set_md5(self,cx,digest):
+		#mx must be between m0 and mm
+		self[cx] = digest
+	def del_item(self,key):
+		del self[key]
+
+	def cal_md5(self):
+		keys = self.data.keys()
+		keys.sort()
+		s = ""
+		for key in keys :
+			s += str(key)
+			s += str(self[key])
+		return md5.new(s).hexdigest()
+	
+	def check_md5(self) :
+		meta_md5_1 = self["cmeta"]
+		self.del_item("cmeta")
+		meta_md5_2 = self.cal_md5()
+		return meta_md5_1 == meta_md5_2
 
 #for class test
 if __name__ == "__main__":
