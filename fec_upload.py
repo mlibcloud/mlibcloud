@@ -10,7 +10,7 @@ from mlibcloud_keys import mlibcloudkey
 from provider_dict import get_cloud_provider
 
 
-def Fec_Upload(file_name,block_size,k,m,stripe_location):
+def Fec_Upload(file_name, container_name, block_size, k, m, stripe_location):
 
 	#fec_file
 	file = open(file_name,"r")
@@ -28,23 +28,29 @@ def Fec_Upload(file_name,block_size,k,m,stripe_location):
 	meta.set_k(k)
 	meta.set_m(m)
 	for i in range(m):
-		meta.set_stripe_location("s" + str(i),stripe_location[i])
+		meta.set_stripe_location("s" + str(i), stripe_location[i])
 
 
 	#generate md5 for stripes and .meta
 	for i in range(m):
 		file_it = open(file_name+'.'+str(i))
-		meta.set_md5("c"+str(i),md5.new(file_it.read()).hexdigest())
+		meta.set_md5("c"+str(i), md5.new(file_it.read()).hexdigest())
 	
 
-	meta.set_md5("cmeta",meta.cal_md5())
+	meta.set_md5("cmeta", meta.cal_md5())
 	
 	meta.save_to_file()
 	print("save meta complete")
 
 	#threading upload
 	#different Sotrage Providers should have different mlibcloudid and mlibcloudkey
-	threads = [createThread(file_name + '.' + str(i),get_cloud_provider(stripe_location[i]),mlibcloudid,mlibcloudkey) for i in range(m)]
+	threads = [createThread(file_name + '.' + str(i), 
+		   					container_name, 
+		   					get_cloud_provider(stripe_location[i]),
+		   					mlibcloudid,
+							mlibcloudkey)
+		   	   for i in range(m)]
+
 	for it in threads :
 		it.start()
 	for it in threads :
@@ -52,21 +58,27 @@ def Fec_Upload(file_name,block_size,k,m,stripe_location):
 
 	#upload .meta to cloud
 	meta_location = set(stripe_location)
-	meta_threads = [createThread(file_name + '.meta',get_cloud_provider(i),mlibcloudid,mlibcloudkey) for i in meta_location]
+	meta_threads = [createThread(file_name + '.meta',
+				     container_name,
+				     get_cloud_provider(i), 
+				     mlibcloudid, 
+				     mlibcloudkey) 
+			for i in meta_location ]
+
 	for it in meta_threads :
 		it.start()
 	for it in meta_threads :
 		it.join()
 
-	
 
 def main():
 	file_name = 'thisgeneration'
+	container_name = "thisgeneration-mlb"
 	block_size = 16
 	k = 3
 	m = 5
 	stripe_location = ["WINDOWS_AZURE_STORAGE" for i in range(m)]
-	Fec_Upload(file_name,block_size,k,m,stripe_location)
+	Fec_Upload(file_name, container_name, block_size, k, m, stripe_location)
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ from mlibcloud_keys import mlibcloudkey
 from provider_dict import get_cloud_provider
 
 
-def fdc_download(file_name,provider_list) :
+def fdc_download(file_name, container_name, provider_list) :
 
 	#provider_list is a list of providers which user has that account
 	#create folders like below
@@ -30,8 +30,13 @@ def fdc_download(file_name,provider_list) :
 
 	#download .meta to provider folder
 	meta_name = file_name + '.meta'
-	meta_threads = [createThread(file_name+'-mlb',meta_name,get_cloud_provider(provider_list[i]),mlibcloudid,mlibcloudkey,provider_dir[i] )
-		       for i in range(len(provider_list))]
+	meta_threads = [createThread(container_name,
+								 meta_name,
+				     			 get_cloud_provider(provider_list[i]),
+				     			 mlibcloudid,
+				     			 mlibcloudkey,
+				     			 provider_dir[i] )
+		       		for i in range(len(provider_list))]
 
 	for it in meta_threads :
 		it.start()
@@ -61,8 +66,13 @@ def fdc_download(file_name,provider_list) :
 	
 	#threading download stripes to file_name-mlb folder
 	
-	stripe_threads = [createThread(file_name+'-mlb',file_name+'.'+str(i),get_cloud_provider(stripe_location[i]),mlibcloudid,mlibcloudkey,curdir) 
-			 for i in range(m)]
+	stripe_threads = [createThread(container_name,
+								   file_name+'.'+str(i),
+								   get_cloud_provider(stripe_location[i]),
+								   mlibcloudid,
+								   mlibcloudkey,
+								   curdir) 
+					 for i in range(m)]
 	
 	for it in stripe_threads :
 		it.start()
@@ -70,15 +80,16 @@ def fdc_download(file_name,provider_list) :
 		it.join()
 
 	#fdc file 
-	fdc_file(block_size,k,m,file_name,curdir,file_size)
+	fdc_file(block_size, k, m, file_name, curdir, file_size)
 	
 	print("fdc file complete")
 
 def main():
 	file_name = "thisgeneration"
+	container_name = "thisgeneration-mlb"
 	provider_list = []
 	provider_list.append("WINDOWS_AZURE_STORAGE")
-	fdc_download(file_name,provider_list)
+	fdc_download(file_name, container_name, provider_list)
 
 
 if __name__ == "__main__" :

@@ -41,7 +41,7 @@ class StorageDownloader :
 
 class createThread(threading.Thread,StorageDownloader) :
 	
-	def __init__(self,conName,objName,provider,Sid,Skey,dest_path = os.path.abspath('.')):
+	def __init__(self, conName, objName, provider, Sid, Skey, dest_path = os.path.abspath('.')):
 		threading.Thread.__init__(self)
 		StorageDownloader.__init__(self,provider,Sid,Skey)
 		self.conName = conName
@@ -49,7 +49,7 @@ class createThread(threading.Thread,StorageDownloader) :
 		self.dest_path = dest_path
 
 	def run(self):
-		result = self.doDownload(self.conName,self.objName,dest_path = self.dest_path)
+		result = self.doDownload(self.conName, self.objName, dest_path = self.dest_path)
 		if result :
 			print("%s %s download success" %(self.conName,self.objName))
 		else :
