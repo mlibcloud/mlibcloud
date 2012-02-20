@@ -1,5 +1,6 @@
 *.py[co]
 *.sw[po]
+*.pyc
 test/secrets.py
 demos/secrets.py
 mlibcloud_keys.py
