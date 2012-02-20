@@ -13,6 +13,7 @@ Provider_Dict["S3_AP_SOUTHEAST"] = Provider.S3_AP_SOUTHEAST
 Provider_Dict["S3_AP_NORTHEAST"] = Provider.S3_AP_NORTHEAST
 Provider_Dict["NINEFOLD"] = Provider.NINEFOLD
 Provider_Dict["GOOGLE_STORAGE"] = Provider.GOOGLE_STORAGE
+Provider_Dict["WINDOWS_AZURE_STORAGE"] = Provider.WINDOWS_AZURE_STORAGE
 
 def get_cloud_provider(provider_name):
 	return Provider_Dict[provider_name]

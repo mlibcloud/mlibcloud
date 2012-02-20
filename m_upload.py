@@ -8,6 +8,7 @@ from libcloud.storage.types import Provider
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import ContainerDoesNotExistError
 from libcloud.storage.types import InvalidContainerNameError
+from libcloud.common.types import LibcloudError
 
 
 
@@ -24,8 +25,8 @@ class StorageUploader :
 		except  ContainerDoesNotExistError:
 			try :
 				retCon = self.driver.create_container(conName)
-			except InvalidContainerNameError :
-				print("Invalid Container Name")
+			except LibcloudError :
+				print("LibcloudError")
 		return retCon
 
 	def doUpload(self,filePath,objName,conName):
@@ -45,7 +46,7 @@ class createThread(threading.Thread,StorageUploader):
 		threading.Thread.__init__(self)
 		StorageUploader.__init__(self,provider,Sid,Skey)
 		self.file_name = file_name
-		self.conName = os.path.splitext(self.file_name)[0] + '.mlb'
+		self.conName = os.path.splitext(self.file_name)[0] + '-mlb'
 		self.conItem = self.getOrcreateCon(self.conName)
 
 	def run(self):

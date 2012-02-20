@@ -2,6 +2,7 @@
 *.sw[po]
 test/secrets.py
 demos/secrets.py
+mlibcloud_keys.py
 *~
 _trial_temp
 build

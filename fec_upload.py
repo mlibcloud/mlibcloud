@@ -61,11 +61,11 @@ def Fec_Upload(file_name,block_size,k,m,stripe_location):
 	
 
 def main():
-	file_name = 'indata'
+	file_name = 'thisgeneration'
 	block_size = 16
 	k = 3
 	m = 5
-	stripe_location = ["S3_AP_NORTHEAST" for i in range(m)]
+	stripe_location = ["WINDOWS_AZURE_STORAGE" for i in range(m)]
 	Fec_Upload(file_name,block_size,k,m,stripe_location)
 
 

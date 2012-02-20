@@ -14,11 +14,11 @@ def fdc_download(file_name,provider_list) :
 
 	#provider_list is a list of providers which user has that account
 	#create folders like below
-	#file_name.mlb/
+	#file_name-mlb/
 	# 	provider1/
 	#	provider2/
 	# 	.../
-	curdir = path.abspath('.')+'/'+file_name+'.mlb/'
+	curdir = path.abspath('.')+'/'+file_name+'-mlb/'
 	os.mkdir(curdir)
 
 	for i in provider_list :
@@ -30,7 +30,7 @@ def fdc_download(file_name,provider_list) :
 
 	#download .meta to provider folder
 	meta_name = file_name + '.meta'
-	meta_threads = [createThread(file_name+'.mlb',meta_name,get_cloud_provider(provider_list[i]),mlibcloudid,mlibcloudkey,provider_dir[i] )
+	meta_threads = [createThread(file_name+'-mlb',meta_name,get_cloud_provider(provider_list[i]),mlibcloudid,mlibcloudkey,provider_dir[i] )
 		       for i in range(len(provider_list))]
 
 	for it in meta_threads :
@@ -59,9 +59,9 @@ def fdc_download(file_name,provider_list) :
 
 	print("read from meta complete")
 	
-	#threading download stripes to file_name.mlb folder
+	#threading download stripes to file_name-mlb folder
 	
-	stripe_threads = [createThread(file_name+'.mlb',file_name+'.'+str(i),get_cloud_provider(stripe_location[i]),mlibcloudid,mlibcloudkey,curdir) 
+	stripe_threads = [createThread(file_name+'-mlb',file_name+'.'+str(i),get_cloud_provider(stripe_location[i]),mlibcloudid,mlibcloudkey,curdir) 
 			 for i in range(m)]
 	
 	for it in stripe_threads :
@@ -75,9 +75,9 @@ def fdc_download(file_name,provider_list) :
 	print("fdc file complete")
 
 def main():
-	file_name = "indata"
+	file_name = "thisgeneration"
 	provider_list = []
-	provider_list.append("S3_AP_NORTHEAST")
+	provider_list.append("WINDOWS_AZURE_STORAGE")
 	fdc_download(file_name,provider_list)
 
 

@@ -19,5 +19,6 @@ Drivers for working with different providers
 
 __all__ = [
     'dummy',
-    'cloudfiles'
+    'cloudfiles',
+    'winazurestorage'
 ]
