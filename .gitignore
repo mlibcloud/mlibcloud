@@ -3,7 +3,7 @@
 *.pyc
 test/secrets.py
 demos/secrets.py
-mlibcloud_keys.py
+mlibcloud_keys
 *~
 _trial_temp
 build

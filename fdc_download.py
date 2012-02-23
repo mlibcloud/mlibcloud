@@ -5,12 +5,11 @@ from fdc import fdc_file
 from meta import FileMeta
 from m_download import StorageDownloader
 from m_download import createThread
-from mlibcloud_keys import mlibcloudid
-from mlibcloud_keys import mlibcloudkey
+from key_secret_dict import read_keys_from_file
 from provider_dict import get_cloud_provider
 
 
-def fdc_download(file_name, container_name, provider_list) :
+def fdc_download(file_name, container_name, provider_list, keys_dict) :
 
 	#provider_list is a list of providers which user has that account
 	#create folders like below
@@ -33,8 +32,8 @@ def fdc_download(file_name, container_name, provider_list) :
 	meta_threads = [createThread(container_name,
 								 meta_name,
 				     			 get_cloud_provider(provider_list[i]),
-				     			 mlibcloudid,
-				     			 mlibcloudkey,
+								 keys_dict[provider_list[i]][0],
+								 keys_dict[provider_list[i]][1],
 				     			 provider_dir[i] )
 		       		for i in range(len(provider_list))]
 
@@ -69,8 +68,8 @@ def fdc_download(file_name, container_name, provider_list) :
 	stripe_threads = [createThread(container_name,
 								   file_name+'.'+str(i),
 								   get_cloud_provider(stripe_location[i]),
-								   mlibcloudid,
-								   mlibcloudkey,
+								   keys_dict[stripe_location[i]][0],
+								   keys_dict[stripe_location[i]][1],
 								   curdir) 
 					 for i in range(m)]
 	
@@ -87,16 +86,14 @@ def fdc_download(file_name, container_name, provider_list) :
 def main():
 	file_name = "thisgeneration"
 	container_name = "thisgeneration-mlb"
+	keys_file = "mlibcloud_keys"
 	provider_list = []
 	provider_list.append("WINDOWS_AZURE_STORAGE")
-	fdc_download(file_name, container_name, provider_list)
+	keys_dict = read_keys_from_file(keys_file)
+	fdc_download(file_name, container_name, provider_list, keys_dict)
 
 
 if __name__ == "__main__" :
 	main()
 
-
-
-
-
-
+#vim :set tabstop=4
