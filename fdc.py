@@ -7,12 +7,12 @@ from os import path
 from pyutil import mathutil
 
 
-def fdc_init(k,file_dir,file_name_prefix = 'temp_file'):
+def fdc_init(k, file_dir, file_name_prefix = 'temp_file'):
 	file_dir_prefix = file_dir  + file_name_prefix + '.'
 	parts = []
 	count = 0
 	part = 0
-	#may cause while(1) looping
+	#TODO may cause while(1) looping
 	pass
 	while count < k :
 		while not path.isfile(file_dir_prefix + str(part)) :
@@ -22,22 +22,22 @@ def fdc_init(k,file_dir,file_name_prefix = 'temp_file'):
 		count += 1
 	return parts
 
-def fdc_file(block_size,k,m,file_name,file_dir,file_size):
-	parts = fdc_init(k,file_dir,file_name)
-	fdecoder = Decoder(k,m)
+def fdc_file(parts, block_size, k, m, file_name, file_dir, file_size):
+#	parts = fdc_init(k, file_dir, file_name)
+	fdecoder = Decoder(k, m)
 	streams = []
 	streams.extend([""] * k)
 	file = open(file_dir  + file_name,'w')
 
 	files = [ open(file_dir  + file_name + '.' + str(i),'r') for i in parts ]
 #	file_size = path.getsize(file_name+'.'+str(parts[0]))	
-	block_count = mathutil.div_ceil(file_size,block_size)
+	block_count = mathutil.div_ceil(file_size, block_size)
 
 	for count in range(block_count) :
 		for i in range(k) :
 			streams[i] = files[i].read(block_size)
 
-		results = fdecoder.decode(streams,parts)
+		results = fdecoder.decode(streams, parts)
 		for i in range(len(results)) :
 			file.write(results[i])
 

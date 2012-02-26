@@ -78,7 +78,7 @@ def main():
 	k = 3
 	m = 5
 	keys_dict = read_keys_from_file(keys_file)
-	stripe_location = ["WINDOWS_AZURE_STORAGE" for i in range(m)]
+	stripe_location = ["NINEFOLD" for i in range(m)]
 	Fec_Upload(file_name, container_name, block_size, k, m, stripe_location, keys_dict)
 
 
