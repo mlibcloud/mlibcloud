@@ -7,9 +7,11 @@ from m_upload import StorageUploader
 from m_upload import createThread
 from key_secret_dict import read_keys_from_file
 from provider_dict import get_cloud_provider
+from GLOBAL import EXP
+from mtimer import mtimer
 
 
-def Fec_Upload(file_name, container_name, block_size, k, m, stripe_location, keys_dict):
+def fec_upload(file_name, container_name, block_size, k, m, stripe_location, keys_dict):
 
 	#fec_file
 	file = open(file_name,"r")
@@ -43,6 +45,11 @@ def Fec_Upload(file_name, container_name, block_size, k, m, stripe_location, key
 
 	#threading upload
 	#different Sotrage Providers should have different mlibcloudid and mlibcloudkey
+
+	if EXP :
+		EXP_timer = mtimer("[EXP] upload_stripes :")
+		EXP_timer.begin()
+
 	threads = [createThread(file_name + '.' + str(i), 
 							container_name, 
 							get_cloud_provider(stripe_location[i]),
@@ -54,6 +61,11 @@ def Fec_Upload(file_name, container_name, block_size, k, m, stripe_location, key
 		it.start()
 	for it in threads :
 		it.join()
+
+	if EXP :
+		EXP_timer.end()
+		EXP_timer.record_data()
+	
 
 	#upload .meta to cloud
 	meta_location = set(stripe_location)
@@ -71,15 +83,15 @@ def Fec_Upload(file_name, container_name, block_size, k, m, stripe_location, key
 
 
 def main():
-	file_name = 'thisgeneration'
-	container_name = "thisgeneration-mlb"
+	file_name = 'forkyou'
+	container_name = "forkyou-mlb"
 	keys_file = 'mlibcloud_keys'
 	block_size = 16
 	k = 3
 	m = 5
 	keys_dict = read_keys_from_file(keys_file)
-	stripe_location = ["NINEFOLD" for i in range(m)]
-	Fec_Upload(file_name, container_name, block_size, k, m, stripe_location, keys_dict)
+	stripe_location = ["S3" for i in range(m)]
+	fec_upload(file_name, container_name, block_size, k, m, stripe_location, keys_dict)
 
 
 if __name__ == "__main__":

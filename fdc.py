@@ -22,7 +22,7 @@ def fdc_init(k, file_dir, file_name_prefix = 'temp_file'):
 		count += 1
 	return parts
 
-def fdc_file(parts, block_size, k, m, file_name, file_dir, file_size):
+def fdc_file(parts, block_size, k, m, file_name, file_dir, file_origin_size):
 #	parts = fdc_init(k, file_dir, file_name)
 	fdecoder = Decoder(k, m)
 	streams = []
@@ -30,7 +30,7 @@ def fdc_file(parts, block_size, k, m, file_name, file_dir, file_size):
 	file = open(file_dir  + file_name,'w')
 
 	files = [ open(file_dir  + file_name + '.' + str(i),'r') for i in parts ]
-#	file_size = path.getsize(file_name+'.'+str(parts[0]))	
+	file_size = path.getsize(file_dir + file_name+'.'+str(parts[0])) * k
 	block_count = mathutil.div_ceil(file_size, block_size)
 
 	for count in range(block_count) :
@@ -40,7 +40,8 @@ def fdc_file(parts, block_size, k, m, file_name, file_dir, file_size):
 		results = fdecoder.decode(streams, parts)
 		for i in range(len(results)) :
 			file.write(results[i])
-
+	file.truncate(file_origin_size)
+	file.close()
 
 def main():
 	file_name_prefix = None

@@ -7,7 +7,8 @@ from m_download import StorageDownloader
 from m_download import createThread
 from key_secret_dict import read_keys_from_file
 from provider_dict import get_cloud_provider
-
+from GLOBAL import EXP
+from mtimer import mtimer
 
 
 def folders_init(file_name, provider_list):
@@ -83,13 +84,25 @@ def download_stripes(file_name, container_name, stripes, k, curdir, keys_dict):
 		it.join()
 
 
+
 def fdc_download(file_name, container_name, provider_list, keys_dict) :
 	#download file stripes and meta ,reconstruct to origin file
+
 	meta_name = file_name + '.meta'
 	#floder_init
 	provider_dirs, curdir = folders_init(file_name, provider_list)
 	#download meta files 
+
+	if EXP :
+		EXP_timer = mtimer("[EXP] download_meta :")
+		EXP_timer.begin()
+
 	provider_time = download_meta(meta_name, container_name, provider_list, keys_dict, provider_dirs)
+
+	if EXP :
+		EXP_timer.end()
+		EXP_timer.record_data()
+
 	#check meta files 
 	meta = None
 	for it in provider_dirs :
@@ -114,23 +127,41 @@ def fdc_download(file_name, container_name, provider_list, keys_dict) :
 	temp = sorted(temp ,key = lambda t : t[2] )
 	#stripe_to_download is a list of ( provider, i) , i means the ith stripes
 	stripe_to_download = [ (temp[i][0] ,temp[i][1]) for i in range(k) ]
-
+	
+	if EXP :
+		EXP_timer.set_name("[EXP] download_stripes :")
+		EXP_timer.begin()
+		
 	download_stripes(file_name, container_name, stripe_to_download, k, curdir, keys_dict)
+
+	if EXP :
+		EXP_timer.end()
+		EXP_timer.record_data()
+
 	#fdc_file
 	parts = [ stripe_to_download[i][1] for i in range(k) ]
+
+	if EXP :
+		EXP_timer.set_name("[EXP] fdc_file :")
+		EXP_timer.begin()
+
 	fdc_file(parts ,block_size, k, m, file_name, curdir, file_size)
+	
+	if EXP :
+		EXP_timer.end()
+		EXP_timer.record_data()
+
 	print("fdc file complete")
 
 
 def main():
-	file_name = "thisgeneration"
-	container_name = "thisgeneration-mlb"
+	file_name = "forkyou"
+	container_name = "forkyou-mlb"
 	keys_file = "mlibcloud_keys"
 	provider_list = []
-	provider_list.append("NINEFOLD")
+	provider_list.append("S3")
 	keys_dict = read_keys_from_file(keys_file)
 	fdc_download(file_name, container_name, provider_list, keys_dict)
-
 
 if __name__ == "__main__" :
 	main()
