@@ -5,7 +5,7 @@ def download_test():
 	file_name = 'forkyoooo'
 	container_name = 'forkyoooo' + '-mlb'
 	provider_list = []
-	provider_list.append("S3")
+	provider_list.append("ALIYUN_STORAGE")
 	keys_file = "mlibcloud_keys"
 	keys_dict = read_keys_from_file(keys_file)
 	

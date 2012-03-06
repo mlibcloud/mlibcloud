@@ -14,7 +14,7 @@ def upload_test() :
 	block_size = 512
 	k = 3
 	m = 5
-	stripe_location = ['S3' for i in range(m)]
+	stripe_location = ['ALIYUN_STORAGE' for i in range(m)]
 	keys_file = 'mlibcloud_keys'
 	keys_dict = read_keys_from_file(keys_file)
 

@@ -40,7 +40,9 @@ DRIVERS = {
     Provider.GOOGLE_STORAGE:
         ('libcloud.storage.drivers.google_storage', 'GoogleStorageDriver'),
     Provider.WINDOWS_AZURE_STORAGE:
-        ('libcloud.storage.drivers.azure', 'AzureStorageDriver')
+        ('libcloud.storage.drivers.azure', 'AzureStorageDriver'),
+    Provider.ALIYUN_STORAGE:
+        ('libcloud.storage.drivers.aliyun_storage', 'AliyunStorageDriver')
 }
 
 def get_driver(provider):

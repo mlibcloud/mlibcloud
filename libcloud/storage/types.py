@@ -53,6 +53,7 @@ class Provider(object):
     GOOGLE_STORAGE = 9
     S3_US_WEST_OREGON = 10
     WINDOWS_AZURE_STORAGE = 11
+    ALIYUN_STORAGE = 12
 
 class ContainerError(LibcloudError):
     error_type = 'ContainerError'
