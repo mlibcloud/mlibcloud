@@ -24,23 +24,30 @@ if __name__ == "__main__":
 		#test for azure cdn	
 		server = "CDN:Azure"
 		up_down = "download"
-		file_size = 16 * 1024
-
 		for url in azure_cdn_urls:
 			try:
+				#print url
 				start_time = time.time()
 				end_time = 0;
-				u = urllib2.urlopen(url)
-				temp_f = open("tempfile", "w")
-				temp_f.write(u.read())
-				temp_f.close()
-				end_time = time.time()
+				code = os.system("wget %s -O tempfile --timeout=10" % url)	
+				#user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+				#headers = {'User-Agent' : user_agent}
+				#req = urllib2.Request(url, headers = headers)
+				#response = urllib2.urlopen(req)
+				#page = response.read()
+				#temp_f = open("tempfile", "w")
+				#temp_f.write(page)
+				#temp_f.close()
+				if code == 0:
+					end_time = time.time()
+				else :
+					end_time = -1
 				os.remove("tempfile");
 			except HTTPError:
 				end_time = -1
 			finally:
+				file_size = url[len(azure_cdn_base):]	
 				TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
-				file_size *= 2
 				
 		#test for original cloud
 
