@@ -1,6 +1,7 @@
 import logging
 import logging.handlers
 from logging.handlers import TimedRotatingFileHandler
+from logging import StreamHandler
 from logging import Formatter
 import time
 import threading
@@ -22,14 +23,18 @@ class TestLogger(object):
 			TestLogger.__instance = object.__new__(TestLogger)
 			object.__init__(TestLogger.__instance)
 			handler = TimedRotatingFileHandler(filename = "mlibcloud.log", when='midnight')
-			handler.setFormatter(Formatter("%(asctime)s\t%(message)s"))
+			handler_s = StreamHandler()
+			formatter = Formatter("%(asctime)s\t%(message)s")
+			handler.setFormatter(formatter)
+			handler_s.setFormatter(formatter)
 			TestLogger.__logger.setLevel(logging.INFO)
 			TestLogger.__logger.addHandler(handler)
+			TestLogger.__logger.addHandler(handler_s);
 		TestLogger.__lock.release()
 		return TestLogger.__instance
 
-	def log(self, testi_id, location, server, start_time, end_time, filesize, up_down):
-		TestLogger.__logger.info("%s\t%s\t%s\t%s\t%s\t%s", location, server, start_time, end_time, file_size, up_down)
+	def log(self, test_id, location, server, start_time, end_time, file_size, up_down):
+		TestLogger.__logger.info("%s\t%s\t%s\t%s\t%s\t%s\t%s", test_id, location, server, start_time, end_time, file_size, up_down)
 	
 	def log_sentence(self, sentence):
 		TestLogger.__logger.info(sentence)
