@@ -59,7 +59,7 @@ def main():
 
 	file = open(file_name, "r")
 	#block_size = 512 * 1024 #512k
-	block_size = 16 #16Byte
+	block_size = 512 #16Byte
 	streams = fec_file(file, block_size, k, m)
 	write_streams_to_file(streams, file_name)
 

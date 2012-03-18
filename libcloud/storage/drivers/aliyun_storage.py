@@ -17,6 +17,9 @@ from libcloud.storage.types import ObjectHashMismatchError
 
 
 class AliyunStorageDriver(OssAPI):
+	
+	name = 'Aliyun Storage'
+
 	def __init__(self, key, secret ):
 		OssAPI.__init__(self, 'storage.aliyun.com', key, secret)
 
@@ -42,7 +45,7 @@ class AliyunStorageDriver(OssAPI):
 			raise LibcloudError("Unexpected status code %s" % (response.status), driver = self)
 			return None
 		except URLError, e:
-			raise LibcloudDrror("Unexpected URLError %s " %(e.code), driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.code), driver = self)
 			return None
 
 	def upload_object(self, file_path, container, object_name, extra = None,
@@ -87,7 +90,7 @@ class AliyunStorageDriver(OssAPI):
 	def download_object(self, obj, destination_path, overwrite_existing = False,
 						delete_on_failure = True) :
 		try :
-			file = open(destination_path + obj.name ,'w')
+			file = open(destination_path,'w')
 			res = self.object_operation("GET", obj.container.name, obj.name, {})
 			if res.status == 200 :
 				file.write(res.read())
@@ -100,7 +103,28 @@ class AliyunStorageDriver(OssAPI):
 		except :
 			return False
 
+	def delete_object(self, obj):
+		try :
+			res = self.object_operation("DELETE", obj.container.name, obj.name, {} )
+			if res.status / 100 == 2:
+				return True
+			return False
+		except :
+			return False
 
-
-
+	def list_container_objects(self, container):
+		ret = None
+		try :
+			res = self.list_bucket(container.name)
+			body = res.read()
+			h = GetBucketXml(body).list()
+			if len(h[0]) == 0:
+				ret = []
+				return ret
+			ret = [ Object(i[0], size=None, hash=None, extra=None,
+                            meta_data=None, container=container, driver=self)
+					for i in h[0] ]
+			return ret
+		except :
+			return ret
 

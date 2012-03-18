@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!usr/bin/env python
 # encoding: utf-8
 """
 Python wrapper around Windows Azure storage
@@ -127,154 +127,10 @@ class RequestWithMethod(Request):
 	def get_method(self):
 		return self._method
 
-'''
-class Storage(object):
-#	def __init__(self, host, account_name, secret_key, use_path_style_uris):
-	 def __init__(self, account_name, secret_key, use_path_style_uris = None , host = CLOUD_BLOB_HOST) :
-		self._host = host
-		self._account = account_name
-		self._key = secret_key
-		if use_path_style_uris is None:
-			use_path_style_uris = re.match(r'^[^:]*[\d:]+$', self._host)
-		self._use_path_style_uris = use_path_style_uris
-		self._credentials = SharedKeyCredentials(self._account, self._key)
-
-	def get_base_url(self):
-		if self._use_path_style_uris:
-			return "http://%s/%s" % (self._host, self._account)
-		else:
-			return "http://%s.%s" % (self._account, self._host)
-
-
-class BlobStorage(Storage):
-#	def __init__(self, host = DEVSTORE_BLOB_HOST, account_name = DEVSTORE_ACCOUNT, secret_key = DEVSTORE_SECRET_KEY, use_path_style_uris = None):
-#		super(BlobStorage, self).__init__(host, account_name, secret_key, use_path_style_uris)
-
-	def create_container(self, container_name, is_public = False):
-		req = RequestWithMethod("PUT", "%s/%s?restype=container" % (self.get_base_url(), container_name))
-		req.add_header("Content-Length", "0")
-		if is_public: req.add_header(PREFIX_PROPERTIES + "publicaccess", "true")
-		self._credentials.sign_request(req)
-		try:
-			response = urlopen(req)
-			return response.code
-		except URLError, e:
-			return e.code
-
-	def delete_container(self, container_name):
-		req = RequestWithMethod("DELETE", "%s/%s?restype=container" % (self.get_base_url(), container_name))
-		self._credentials.sign_request(req)
-		try:
-			response = urlopen(req)
-			return response.code
-		except URLError, e:
-			return e.code
-
-	def list_containers(self):
-		req = Request("%s/?comp=list" % self.get_base_url())
-		self._credentials.sign_request(req)
-		dom = minidom.parseString(urlopen(req).read())
-		containers = dom.getElementsByTagName("Container")
-		for container in containers:
-			container_name = container.getElementsByTagName("Name")[0].firstChild.data
-			etag = container.getElementsByTagName("Etag")[0].firstChild.data
-#			last_modified = time.strptime(container.getElementsByTagName("LastModified")[0].firstChild.data, TIME_FORMAT)
-#			yield (container_name, etag, last_modified)
-			yield (container_name,etag)
-		
-		dom.unlink() #Docs say to do this to force GC. Ugh.
-
-
-	def container_exists(self,container_name):
-		req = Request("%s/?comp=list&prefix=%s" % (self.get_base_url(), container_name))
-		self._credentials.sign_request(req)
-		dom = minidom.parseString(urlopen(req).read())
-		containers = dom.getElementsByTagName("Container")
-		for container in containers :
-			if container_name == container.getElementsByTagName("Name")[0].firstChild.data :
-				return True
-		return False 
-
-
-	def put_blob(self, container_name, blob_name, data, content_type = "", metadata = {}):
-		req = RequestWithMethod("PUT", "%s/%s/%s" % (self.get_base_url(), container_name, blob_name), data=data)
-		req.add_header("Content-Length", "%d" % len(data))
-		req.add_header('x-ms-blob-type', 'BlockBlob')
-		for key, value in metadata.items():
-			req.add_header("x-ms-meta-%s" % key, value)
-		req.add_header("Content-Type", content_type)
-		self._credentials.sign_request(req)
-		try:
-			response = urlopen(req)
-			return response.code
-		except URLError, e:
-			return e.code
-
-	def delete_blob(self, container_name, blob_name):
-		req = RequestWithMethod("DELETE", "%s/%s/%s" % (self.get_base_url(), container_name, blob_name))
-		self._credentials.sign_request(req)
-		urlopen(req)
-
-	def get_blob(self, container_name, blob_name):
-		req = Request("%s/%s/%s" % (self.get_base_url(), container_name, blob_name))
-		self._credentials.sign_request(req)
-		return urlopen(req).read()
-
-	def get_blob_with_metadata(self, container_name, blob_name):
-		req = Request("%s/%s/%s" % (self.get_base_url(), container_name, blob_name))
-		self._credentials.sign_request(req)
-		response = urlopen(req)
-		metadata = {}
-		for key, value in response.info().items():
-			if key.startswith('x-ms-meta-'):
-				metadata[key[len('x-ms-meta-'):]] = value
-		return metadata, response.read()
-
-	def blob_exists(self, container_name, blob_name):
-		req = RequestWithMethod("HEAD", "%s/%s/%s" % (self.get_base_url(), container_name, blob_name))
-		self._credentials.sign_request(req)
-		try:
-			urlopen(req)
-			return True
-		except:
-			return False
-
-	def list_blobs(self, container_name, blob_prefix=None):
-		marker = None
-		while True:
-			url = "%s/%s?restype=container&comp=list" % (self.get_base_url(), container_name)
-			if not blob_prefix is None: url += "&%s" % urlencode({"prefix": blob_prefix})
-			if not marker is None: url += "&marker=%s" % marker
-			req = Request(url)
-			self._credentials.sign_request(req)
-			dom = minidom.parseString(urlopen(req).read())
-			blobs = dom.getElementsByTagName("Blob")
-			for blob in blobs:
-				blob_name = blob.getElementsByTagName("Name")[0].firstChild.data
-				etag = blob.getElementsByTagName("Etag")[0].firstChild.data
-#				last_modified = time.strptime(blob.getElementsByTagName("LastModified")[0].firstChild.data, TIME_FORMAT)
-#				yield (blob_name, etag, last_modified)
-				yield(blob_name,etag)
-			try: marker = dom.getElementsByTagName("NextMarker")[0].firstChild.data
-			except: marker = None
-			if marker is None: break
-
-	def put_block(self, container_name, blob_name, block_id, data):
-		encoded_block_id = urlencode({"comp": "block", "blockid": block_id})
-		req = RequestWithMethod("PUT", "%s/%s/%s?%s" % (self.get_base_url(), container_name, blob_name, encoded_block_id), data=data)
-		req.add_header("Content-Type", "")
-		req.add_header("Content-Length", "%d" % len(data))
-		self._credentials.sign_request(req)
-		try:
-			response = urlopen(req)
-			return response.code
-		except URLError, e:
-			return e.code
-'''
-
 
 class AzureStorageDriver(StorageDriver) :
 
+	name = 'Windows Azure Storage'
 	
 	def __init__(self, key, secret = None, secure = True, host = None, port = None):
 		self._credentials = SharedKeyCredentials(key, secret)
@@ -292,7 +148,6 @@ class AzureStorageDriver(StorageDriver) :
 			if container_name == container.getElementsByTagName("Name")[0].firstChild.data :
 				return True
 		return False 
-
 
 	def get_container(self, container_name):
 		if self.container_exists(container_name) :
@@ -369,6 +224,45 @@ class AzureStorageDriver(StorageDriver) :
 			return True
 		except :
 			return False
+
+	def list_container_objects(self, container):
+		marker = None
+		while True:
+			url = "%s/%s?restype=container&comp=list" % (self.get_base_url(), container.name)
+			if not marker is None: url += "&marker=%s" % marker
+			req = Request(url)
+			self._credentials.sign_request(req)
+			dom = minidom.parseString(urlopen(req).read())
+			blobs = dom.getElementsByTagName("Blob")
+			for blob in blobs:
+				blob_name = blob.getElementsByTagName("Name")[0].firstChild.data
+#				etag = blob.getElementsByTagName("Etag")[0].firstChild.data
+				yield(Object(blob_name, size = None, hash = None, extra = None,
+					meta_data = None,container = container, driver = self) )
+			try: 
+				marker = dom.getElementsByTagName("NextMarker")[0].firstChild.data
+			except: 
+				marker = None
+			if marker is None: break
+
+	def delete_object(self, obj):
+		container_name = obj.container.name
+		obj_name = obj.name
+		try :
+			req = RequestWithMethod("DELETE", "%s/%s/%s" % (self.get_base_url(), container_name, obj_name))
+			self._credentials.sign_request(req)
+			ret = urlopen(req)
+			if ret.code / 100 == 2:
+				return True
+			else :
+				raise LibcloudError("Unexpected status code %s" % (ret.status) ,driver = self)	
+				return False
+		except URLError, e:
+			raise LibcloudError("Unexpected URLError %s " %(e.code) ,driver = self)
+			return False
+
+
+
 
 
 def main():

@@ -45,13 +45,13 @@ def fdc_file(parts, block_size, k, m, file_name, file_dir, file_origin_size):
 
 def main():
 	file_name_prefix = None
-	k = 3
-	m = 5
-	block_size = 16
-	file_name_prefix = sys.argv[1]
-	k = int(sys.argv[2])
-	m = int(sys.argv[3])
-	fdc_file(block_size,k,m,file_name_prefix)
+	file_name = 'fuckxxx'
+
+	block_size = 512
+	k = 2
+	m = 3
+	parts = [0,1]
+	fdc_file(parts, block_size, k, m, file_name, './', 5201)
 	
 if __name__ == '__main__' :
 	main()
