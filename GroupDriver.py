@@ -274,7 +274,8 @@ class GroupDriver :
 		obj_list = [ obj_drivers[i].get_object( container_name, obj_names[i])
 					for i in range(k) ]
 
-		ret = mObject(obj_name, file_size, None, {} ,meta, obj_list, obj_drivers )
+		ret = mObject(obj_name, file_size, None, {} ,meta, obj_list, 
+						container_name, obj_drivers )
 		return ret
 
 	
@@ -362,10 +363,17 @@ class GroupDriver :
 		return ret
 
 
-#	def delete_object(self, objs):
-		#objs is a list of objs to delete
-#		ret = None
-#		ret = [ self.drivers[i].delete_object(objs[i]
-
+	def delete_object(self, mobj):
+		#delete .meta file
+		for d in mobj.drivers :
+			d.delete_object(d.get_object(mobj.container_name, mobj.name))
+		
+		#delete file stripes
+		ret = [ d.delete_object(mobj.objs[i]) 
+				for d in mobj.drivers ]			
+		for it in ret :
+			if not it :
+				return False
+		return True
 
 

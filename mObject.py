@@ -3,13 +3,14 @@ from meta import FileMeta
 
 class mObject:
 	def __init__(self, name, size, hash, extra, meta_data, 
-				 obj_list, driver_list):
+				 obj_list, container_name, driver_list):
 		self.objs = obj_list
 		self.name = name
 		self.size = size
 		self.hash = hash
 		self.extra = extra or {}
 		self.meta_data = meta_data or {}
+		self.container_name = container_name
 		self.drivers = driver_list
 		
 
