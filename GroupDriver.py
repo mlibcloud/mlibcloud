@@ -23,12 +23,15 @@ class upload_object_thread(threading.Thread):
 		self.file_path = file_path
 		self.container = container
 		self.obj_name = obj_name
+		self.ret = False
 
 	def run(self):
 		try:
 			self.driver.upload_object(self.file_path, self.container, self.obj_name, extra = {'content_type' : 'zip'})
+			self.ret = True
 		except : 
 			print("upload error")
+			self.ret = False
 
 
 class download_object_thread(threading.Thread):
@@ -47,7 +50,7 @@ class download_object_thread(threading.Thread):
 			mt.begin()
 
 		try:
-			ret = self.driver.download_object(self.obj, self.dest_path, overwrite_existing=False, delete_on_failure=True)
+			ret = self.driver.download_object(self.obj, self.dest_path, overwrite_existing=True, delete_on_failure=True)
 			self.ret = True
 			if self.timing :
 				mt.end()
@@ -60,7 +63,6 @@ class download_object_thread(threading.Thread):
 				self.time = float(9999999999)
 				self.name = mt.name
 
-		return ret
 
 
 
@@ -129,6 +131,30 @@ class GroupDriver :
 		for it in stripe_threads :
 			it.join()
 
+		#try to reupload
+		retry_count = 0
+		while retry_count < 3:
+			retry_threads = []
+			retry = False
+			retry_count += 1
+			for it in stripe_threads :
+				if not it.ret :
+					retry_threats.append(it)
+					retry = True
+			if not retry :
+				break
+			stripe_threads = retry_threads 
+			for it in stripe_threads :
+				it.start()
+			for it in stripe_threads :
+				it.join()
+
+		if retry :
+			print("upload stripes failed")
+			raise LibcloudError("upload stripes failed", driver = self )
+
+
+
 		#upload .meta to cloud
 		meta_threads = [upload_object_thread(self.drivers[i],
 										file_path+'.meta',
@@ -139,6 +165,30 @@ class GroupDriver :
 			it.start()
 		for it in meta_threads :
 			it.join()
+
+		#retry upload 
+		retry_count = 0
+		while retry_count < 3:
+			retry_threads = []
+			retry = False
+			retry_count += 1
+			for it in meta_threads :
+				if not it.ret :
+					retry_threads.append(it)
+					retry = True
+			if not retry :
+				break
+			meta_threads = retry_threads 
+			for it in stripe_threads :
+				it.start()
+			for it in stripe_threads :
+				it.join()
+
+		if retry :
+			print("upload meta failed")
+			raise LibcloudError("upload meta failed", driver = self )
+
+
 
 	def get_object(self, container_name, obj_name):
 		meta_name = obj_name + '.meta'
@@ -232,7 +282,40 @@ class GroupDriver :
 		for it in stripe_threads :
 			it.join()
 
-		parts = [ int(os.path.splitext(objs[i].name)[1][1:]) for i in range(self.k) ]
+
+		success_objs = []
+		pt = self.k
+		while True :
+			retry = False
+			retry_threads = []
+			for it in stripe_threads :
+				if not it.ret :
+					if pt < self.m :
+						retry_threads.append( 
+							download_object_thread(objs[pt].dirver,
+													objs[pt],
+													dest_path+objs[pt].name))
+						pt += 1
+						retry = True
+					else :
+						retry = False
+						break
+				else :
+					success_objs.append(it.obj)
+
+			if not retry :
+				break
+			stripe_threads = retry_threads
+			for it in stripe_threads :
+				it.start()
+			for it in stripe_threads :
+				it.join()
+
+		if not (pt < self.m) :
+			print("download stripes failed")
+			raise LibcloudError("download stripes failed", driver = self )
+
+		parts = [ int(os.path.splitext(i.name)[1][1:]) for i in success_objs ]
 
 		#fdc_file
 		fdc_file(parts, self.block_size, self.k, self.m, mobj.name, dest_path, mobj.size)

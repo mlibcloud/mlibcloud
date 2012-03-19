@@ -20,28 +20,32 @@ def main():
 	driver = GroupDriver([driver_cf, driver_s3, driver_ali])
 
 
-	#upload
-	driver.set_original_share(2)
-	driver.set_total_share(3)
-	driver.set_block_size(512)
-	
-#	driver.create_container('fuck-mlibcloud')
-	
-#	file_path = '/home/pin/debug/fuck'
-#	container_name = 'fuck-mlibcloud'
-#	obj_name = 'fuck'
-	
-#	containers = driver.get_container(container_name)
-#	driver.upload_object(file_path, containers, obj_name)
+	upload = False
+	download = True
+
+	if upload :
+		#upload
+		driver.set_original_share(2)
+		driver.set_total_share(3)
+		driver.set_block_size(512)
+
+		container_name = 'fuckyou-mlibcloud'
+		file_path = '/home/pin/debug/fuckyou'
+		obj_name = 'fuckyou'
+
+		driver.create_container(container_name)
+		containers = driver.get_container(container_name)
+		driver.upload_object(file_path, containers, obj_name)
 
 
+	if download :
+		#dwonload
+		dest_path = '/home/pin/debug/'
+		container_name = 'fuckyou-mlibcloud'
+		obj_name = 'fuckyou'
 
-	#dwonload
-	dest_path = '/home/pin/debug/'
-	container_name = 'fuck-mlibcloud'
-	obj_name = 'fuck'
-	mobj = driver.get_object(container_name, obj_name)
-	driver.download_object(mobj, dest_path)
+		mobj = driver.get_object(container_name, obj_name)
+		driver.download_object(mobj, dest_path)
 
 
 
