@@ -32,10 +32,10 @@ from libcloud.common.types import LazyList
 
 
 
-DEVSTORE_ACCOUNT = "devstoreaccount1"
-DEVSTORE_SECRET_KEY = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
+#DEVSTORE_ACCOUNT = "devstoreaccount1"
+#DEVSTORE_SECRET_KEY = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
 
-DEVSTORE_BLOB_HOST = "127.0.0.1:10000"
+#DEVSTORE_BLOB_HOST = "127.0.0.1:10000"
 
 CLOUD_BLOB_HOST = "blob.core.windows.net"
 
@@ -169,7 +169,7 @@ class AzureStorageDriver(StorageDriver) :
 			else :
 				raise LibcloudError("Unexpected status code %s" % (response.status), driver = self)
 		except URLError, e:
-			raise LibcloudDrror("Unexpected URLError %s " %(e.code), driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.code), driver = self)
 
 
 	def upload_object(self, file_path, container, object_name, extra = None,
