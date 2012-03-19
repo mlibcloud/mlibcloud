@@ -107,6 +107,11 @@ def test_original(driver, container_name, server):
 		container = driver.get_container(container_name)
 	except ContainerDoesNotExistError:
 		container = driver.create_container(container_name)
+
+	except AtmosError:
+		container = driver.create_container(container_name)
+	
+
 	
 	#test for upload
 	f_group = RandomFile.create_group(location, testid)
