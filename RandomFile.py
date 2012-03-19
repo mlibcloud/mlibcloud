@@ -7,7 +7,7 @@ class RandomFile(object):
 	@staticmethod
 	def create(filepath, filesize):
 		f = open(filepath, "w")
-		random = open("/dev/random", "r")
+		random = open("/dev/urandom", "r")
 		size = 0
 		while (size < filesize):
 			data = random.read(1024)
