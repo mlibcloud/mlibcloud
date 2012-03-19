@@ -56,20 +56,20 @@ def test_original(driver, container_name, server):
 		container = driver.create_container(container_name)
 	
 	#test for upload
-#	f_group = RandomFile.create_group(location, testid)
-#	for f_path in f_group:
-#		start_time = time.time()
-#		try:
-#			driver.upload_object(f_path, container, f_path, {"content_type": "application/octo-stream"})
-#			end_time = time.time()
-#		except  LibcloudError, ObjectHashMismatchError:
-#			end_time = -1
-#		except socket.error:
-#			end_time = -1
-#		file_size = f_path.split("_")[-1]
-#		up_down = "upload"
-#		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
-#	RandomFile.delete_group(f_group)
+	f_group = RandomFile.create_group(location, testid)
+	for f_path in f_group:
+		start_time = time.time()
+		try:
+			driver.upload_object(f_path, container, f_path, {"content_type": "application/octo-stream"})
+			end_time = time.time()
+		except  LibcloudError, ObjectHashMismatchError:
+			end_time = -1
+		except socket.error:
+			end_time = -1
+		file_size = f_path.split("_")[-1]
+		up_down = "upload"
+		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
+	RandomFile.delete_group(f_group)
 	
 	#test for download
 	objects = []
