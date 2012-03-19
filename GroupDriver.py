@@ -188,7 +188,10 @@ class GroupDriver :
 		if retry :
 			print("upload meta failed")
 			raise LibcloudError("upload meta failed", driver = self )
-
+		#delete file stripes and file meta
+		for i in range(self.m) :
+			os.remove(file_path + '.' + str(i))
+		os.remove(file_path + '.meta')
 
 
 	def get_object(self, container_name, obj_name):
