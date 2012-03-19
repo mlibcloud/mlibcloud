@@ -9,19 +9,20 @@ from libcloud.storage.types import Provider
 def main():
 	key_file = 'mlibcloud_keys'
 	key_dict = read_keys_from_file(key_file)
-	CloudFiles = get_driver(Provider.CLOUDFILES_UK)
+	Google = get_driver(Provider.GOOGLE_STORAGE)
 	S3 = get_driver(Provider.S3_US_WEST)
 	Aliyun = get_driver(Provider.ALIYUN_STORAGE)
 
-	driver_cf = CloudFiles(key_dict['CLOUDFILES_UK'][0],key_dict['CLOUDFILES_UK'][1])
+	driver_cf = Google(key_dict['GOOGLE_STORAGE'][0],key_dict['GOOGLE_STORAGE'][1])
 	driver_s3 = S3(key_dict['S3_US_WEST'][0],key_dict['S3_US_WEST'][1])
 	driver_ali = Aliyun(key_dict['ALIYUN_STORAGE'][0],key_dict['ALIYUN_STORAGE'][1])
 
 	driver = GroupDriver([driver_cf, driver_s3, driver_ali])
 
 
-	upload = False
-	download = True
+	upload = True
+	download = False
+	delete = False
 
 	if upload :
 		#upload

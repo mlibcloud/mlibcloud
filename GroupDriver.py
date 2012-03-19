@@ -27,9 +27,10 @@ class upload_object_thread(threading.Thread):
 
 	def run(self):
 		try:
-			self.driver.upload_object(self.file_path, self.container, self.obj_name, extra = {'content_type' : 'zip'})
-			self.ret = True
-		except : 
+			ret = self.driver.upload_object(self.file_path, self.container, self.obj_name, extra = {'content_type' : 'zip'})
+			self.ret = ret != None and True or False
+
+		except (LibcloudError, socket.error ): 
 			print("upload error")
 			self.ret = False
 
@@ -50,20 +51,17 @@ class download_object_thread(threading.Thread):
 			mt.begin()
 
 		try:
-			ret = self.driver.download_object(self.obj, self.dest_path, overwrite_existing=True, delete_on_failure=True)
-			self.ret = True
+			self.ret = self.driver.download_object(self.obj, self.dest_path, overwrite_existing=True, delete_on_failure=True)
 			if self.timing :
 				mt.end()
 				self.time = mt.get_interval()
 				self.name = mt.name
-		except :
+		except (LibcloudError, socket.error):
 			print("download object error")
 			self.ret = False
 			if self.timing :
 				self.time = float(9999999999)
 				self.name = mt.name
-
-
 
 
 class GroupDriver :
