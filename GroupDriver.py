@@ -30,6 +30,8 @@ class upload_object_thread(threading.Thread):
 		try:
 			ret = self.driver.upload_object(self.file_path, self.container, self.obj_name, extra = self.extra)
 			self.ret = ret != None and True or False
+			if not self.ret :
+				raise LibcloudError("upload %s failed" %self.obj_name, driver = self.driver)
 
 		except (LibcloudError, socket.error ): 
 			print("upload error")
@@ -57,6 +59,8 @@ class download_object_thread(threading.Thread):
 				mt.end()
 				self.time = mt.get_interval()
 				self.name = mt.name
+			if not self.ret :
+				raise LibcloudError("download %s failed " %self.obj.name , driver = self.driver )
 		except (LibcloudError, socket.error):
 			print("download object error")
 			self.ret = False
@@ -131,27 +135,32 @@ class GroupDriver :
 		for it in stripe_threads :
 			it.join()
 
-		#try to reupload
-		retry_count = 0
-		while retry_count < 3:
-			retry_threads = []
-			retry = False
-			retry_count += 1
-			for it in stripe_threads :
-				if not it.ret :
-					retry_threats.append(it)
-					retry = True
-			if not retry :
+		for it in stripe_threads :
+			if not it.ret :
+				raise LibcloudError("upload stripes failed", driver = self)
 				break
-			stripe_threads = retry_threads 
-			for it in stripe_threads :
-				it.start()
-			for it in stripe_threads :
-				it.join()
 
-		if retry :
-			print("upload stripes failed")
-			raise LibcloudError("upload stripes failed", driver = self )
+		#try to reupload
+#		retry_count = 0
+#		while retry_count < 3:
+#			retry_threads = []
+#			retry = False
+#			retry_count += 1
+#			for it in stripe_threads :
+#				if not it.ret :
+#					retry_threats.append(it)
+#					retry = True
+#			if not retry :
+#				break
+#			stripe_threads = retry_threads 
+#			for it in stripe_threads :
+#				it.start()
+#			for it in stripe_threads :
+#				it.join()
+
+#		if retry :
+#			print("upload stripes failed")
+#			raise LibcloudError("upload stripes failed", driver = self )
 
 
 
@@ -167,27 +176,36 @@ class GroupDriver :
 		for it in meta_threads :
 			it.join()
 
-		#retry upload 
-		retry_count = 0
-		while retry_count < 3:
-			retry_threads = []
-			retry = False
-			retry_count += 1
-			for it in meta_threads :
-				if not it.ret :
-					retry_threads.append(it)
-					retry = True
-			if not retry :
+		for it in meta_threads :
+			if not it.ret :
+				raise LibcloudError("upload metas failed", driver = self)
 				break
-			meta_threads = retry_threads 
-			for it in stripe_threads :
-				it.start()
-			for it in stripe_threads :
-				it.join()
 
-		if retry :
-			print("upload meta failed")
-			raise LibcloudError("upload meta failed", driver = self )
+
+		#retry upload 
+#		retry_count = 0
+#		while retry_count < 3:
+#			retry_threads = []
+#			retry = False
+#			retry_count += 1
+#			for it in meta_threads :
+#				if not it.ret :
+#					retry_threads.append(it)
+#					retry = True
+#			if not retry :
+#				break
+#			meta_threads = retry_threads 
+#			for it in stripe_threads :
+#				it.start()
+#			for it in stripe_threads :
+#				it.join()
+
+#		if retry :
+#			print("upload meta failed")
+#			raise LibcloudError("upload meta failed", driver = self )
+
+
+
 		#delete file stripes and file meta
 		for i in range(self.m) :
 			os.remove(file_path + '.' + str(i))
