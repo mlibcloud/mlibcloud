@@ -60,8 +60,8 @@ driver_ap_southeast = S3_AP_SOUTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Y
 S3_AP_NORTHEAST = get_driver(Provider.S3_AP_NORTHEAST)
 driver_ap_southeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
 
-#Cloudfiles_UK = get_driver(Provider.CLOUDFILES_UK)
-#driver_cloudfiles_uk = Cloudfiles_UK("mlibcloud0", "d544e3b4a183ba4d07777be6e6ce0b77z")
+Cloudfiles_UK = get_driver(Provider.CLOUDFILES_UK)
+driver_cloudfiles_uk = Cloudfiles_UK("mlibcloud0", "d544e3b4a183ba4d07777be6e6ce0b77")
 
 Cloudfiles_US = get_driver(Provider.CLOUDFILES_US)
 driver_cloudfiles_us = Cloudfiles_US("mlibcloud", "5140858194409ed2dd2ec13e008ac754")
@@ -284,13 +284,12 @@ if __name__ == "__main__":
 
 #		test_cloudfiles_us()
 		
-		#TODO
 #		test_cloudfiles_uk()
 
 #		test_google_storage()
 
 		#TODO
-#		test_ninefold()
+		test_ninefold()
 	
 		#TODO
 		#test for mlibcloud
