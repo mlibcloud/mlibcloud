@@ -10,11 +10,33 @@ from RandomFile import RandomFile
 import string
 import socket
 import random
-from GroupDriver import GroupDriver
-
+#from GroupDriver import GroupDriver
 
 location = "Beijing"
-testid = 0;
+
+
+#read testid from a checkpoint file
+def read_checkpoint():
+	checkpoint = 0
+	try:
+		f = open("test-checkpoint", "r")
+		line = f.readline()
+		checkpoint = string.atoi(line)
+		f.close()
+	except IOError:
+		None
+	return checkpoint
+
+def write_checkpoint(checkpoint):
+	try:
+		f = open("test-checkpoint", "w")
+		f.write("%s" % checkpoint)
+		f.close()
+	except IOError:
+		None
+	
+testid = read_checkpoint();
+
 
 #drivers
 Ali = get_driver(Provider.ALIYUN_STORAGE)
@@ -260,7 +282,6 @@ if __name__ == "__main__":
 
 #		test_azure_us()
 
-		#TODO
 #		test_cloudfiles_us()
 		
 		#TODO
@@ -268,11 +289,14 @@ if __name__ == "__main__":
 
 #		test_google_storage()
 
+		#TODO
 #		test_ninefold()
 	
 		#TODO
+		#test for mlibcloud
 #		test_mlibcloud_3_5()
 #		test_mlibcloud_3_6()
 #		test_mlibcloud_3_7()
 
-		#test for mlibcloud
+		write_checkpoint(testid)
+		
