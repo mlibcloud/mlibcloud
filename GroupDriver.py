@@ -345,9 +345,20 @@ class GroupDriver :
 		
 
 
-	def list_container_objects(self, driver, container):
+	def list_container_objects(self, container):
+		#container is a list of containers,values in the containers are the same except container.driver
+		#a container_name is unique to a GroupDriver
 		ret = None
-		ret = driver.list_container_objects(container)
+		container_name = container[0].name
+		obj_list = []
+		for i in range(self.m) :
+			obj_list.extend(container[i].driver.list_container_objects(container))
+		
+		for i in obj_list :
+			if i.name[-5 : ] == '.meta' :
+				obj_name_set.append(os.path.splitext(i.name)[0])
+		
+		ret = [self.get_object(container_name, i) for i in obj_name_set ]
 		return ret
 
 
