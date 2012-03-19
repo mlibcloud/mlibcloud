@@ -40,17 +40,17 @@ def fdc_file(parts, block_size, k, m, file_name, file_dir, file_origin_size):
 		results = fdecoder.decode(streams, parts)
 		for i in range(len(results)) :
 			file.write(results[i])
-	file.truncate(file_origin_size)
+#	file.truncate(file_origin_size)
 	file.close()
 
 def main():
 	file_name_prefix = None
-	file_name = 'fuckxxx'
+	file_name = 'thisgeneration'
 
 	block_size = 512
-	k = 2
-	m = 3
-	parts = [0,1]
+	k = 3
+	m = 5
+	parts = [0,1,2]
 	fdc_file(parts, block_size, k, m, file_name, './', 5201)
 	
 if __name__ == '__main__' :

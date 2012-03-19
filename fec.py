@@ -50,12 +50,13 @@ def write_streams_to_file(streams, file_name_prefix = "temp_file"):
 
 def main():
 	file_name = None
-	k = 3
+	k = 3 
 	m = 5
 
-	file_name = sys.argv[1]
-	k = int(sys.argv[2])
-	m = int(sys.argv[3])
+#	file_name = sys.argv[1]
+#	k = int(sys.argv[2])
+#	m = int(sys.argv[3])
+	file_name = 'thisgeneration'
 
 	file = open(file_name, "r")
 	#block_size = 512 * 1024 #512k

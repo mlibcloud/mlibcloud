@@ -17,17 +17,18 @@ from libcloud.storage.types import LibcloudError
 
 class upload_object_thread(threading.Thread):
 	
-	def __init__(self, driver, file_path, container, obj_name):
+	def __init__(self, driver, file_path, container, obj_name, extra):
 		threading.Thread.__init__(self)
 		self.driver = driver
 		self.file_path = file_path
 		self.container = container
 		self.obj_name = obj_name
+		self.extra = extra
 		self.ret = False
 
 	def run(self):
 		try:
-			ret = self.driver.upload_object(self.file_path, self.container, self.obj_name, extra = {'content_type' : 'zip'})
+			ret = self.driver.upload_object(self.file_path, self.container, self.obj_name, extra = self.extra)
 			self.ret = ret != None and True or False
 
 		except (LibcloudError, socket.error ): 
@@ -90,7 +91,7 @@ class GroupDriver :
 		containers = [ d.get_container(container_name) for d in self.drivers ]
 		return containers
 
-	def upload_object(self, file_path, container, obj_name) :
+	def upload_object(self, file_path, container, obj_name, extra = None) :
 		file_name = os.path.basename(file_path)
 		file = open(file_path,'r')
 		streams = fec_file(file, self.block_size, self.k, self.m)
@@ -121,7 +122,8 @@ class GroupDriver :
 		stripe_threads = [upload_object_thread(self.drivers[i],
 									 file_path+'.'+str(i),
 									 container[i],
-									 obj_name+'.'+str(i))
+									 obj_name+'.'+str(i),
+									 extra)
 						for i in range(self.m) ]
 
 		for it in stripe_threads :
@@ -157,7 +159,8 @@ class GroupDriver :
 		meta_threads = [upload_object_thread(self.drivers[i],
 										file_path+'.meta',
 										container[i],
-										obj_name+'.meta')
+										obj_name+'.meta',
+										extra)
 						for i in range(self.m) ]
 		for it in meta_threads :
 			it.start()
