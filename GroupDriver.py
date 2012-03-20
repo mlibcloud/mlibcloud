@@ -39,13 +39,14 @@ class upload_object_thread(threading.Thread):
 
 
 class download_object_thread(threading.Thread):
-	def __init__(self, driver, obj, dest_path, timing = False):
+	def __init__(self, driver, obj, dest_path, overwrite_existing = True, timing = False):
 		threading.Thread.__init__(self)
 		self.driver = driver
 		self.obj = obj
 		self.dest_path = dest_path
 		self.timing = timing
 		self.ret = False
+		self.owe = overwrite_existing
 	def run(self):
 		ret = False
 		print(self.dest_path)
@@ -54,7 +55,7 @@ class download_object_thread(threading.Thread):
 			mt.begin()
 
 		try:
-			self.ret = self.driver.download_object(self.obj, self.dest_path, overwrite_existing=True, delete_on_failure=True)
+			self.ret = self.driver.download_object(self.obj, self.dest_path, overwrite_existing=self.owe, delete_on_failure=True)
 			if self.timing :
 				mt.end()
 				self.time = mt.get_interval()
@@ -67,6 +68,16 @@ class download_object_thread(threading.Thread):
 			if self.timing :
 				self.time = float(9999999999)
 				self.name = mt.name
+
+class list_container_objects_thread(threading.Thread) :
+	def __init__(self, container):
+		threading.Thread.__init__(self)
+		self.container = container
+		self.obj_list = None
+
+
+	def run(self):
+		self.obj_list = self.container.driver.list_container_objects(self.container)
 
 
 class GroupDriver :
@@ -226,6 +237,7 @@ class GroupDriver :
 		dest_path = './temp/'
 		meta_threads = [ download_object_thread(self.drivers[i], meta_objs[i],
 												dest_path + meta_name +'.'+str(i),
+												overwrite_existing = True,
 												timing = True)
 						for i in range(len(self.drivers)) ]
 		for it in meta_threads :
@@ -297,10 +309,11 @@ class GroupDriver :
 		print("read from meta completa")
 		return (k, m, file_size, block_size, stripe_location)
 
-	def download_object(self, mobj, dest_path):
+	def download_object(self, mobj, dest_path, overwrite_existing = True):
 		objs = mobj.objs
 		stripe_threads = [ download_object_thread(objs[i].driver, objs[i],
-												dest_path + objs[i].name)
+												dest_path + objs[i].name,
+												overwrite_existing)
 							for i in range(self.k) ]
 		for it in stripe_threads :
 			it.start()
@@ -319,7 +332,8 @@ class GroupDriver :
 						retry_threads.append( 
 							download_object_thread(objs[pt].dirver,
 													objs[pt],
-													dest_path+objs[pt].name))
+													dest_path+objs[pt].name,
+													overwrite_existing))
 						pt += 1
 						retry = True
 					else :
@@ -354,8 +368,17 @@ class GroupDriver :
 		ret = None
 		container_name = container[0].name
 		obj_list = []
-		for i in range(self.m) :
-			obj_list.extend(container[i].driver.list_container_objects(container[i]))
+		list_threads = [list_container_objects_thread(container[i]) 
+						for i in range(self.m) ]
+		
+		for it in list_threads :
+			it.start()
+		for it in list_threads :
+			it.join()
+
+		for it in list_threads :
+			obj_list.extend(it.obj_list)
+
 		obj_name_list = []
 		for i in obj_list :
 			if cmp(i.name[-5 : ], '.meta') == 0 :
