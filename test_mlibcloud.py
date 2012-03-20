@@ -297,8 +297,8 @@ if __name__ == "__main__":
 		#TODO
 		#test for mlibcloud
 		test_mlibcloud_3_5()
-#		test_mlibcloud_3_6()
-#		test_mlibcloud_3_7()
+		test_mlibcloud_3_6()
+		test_mlibcloud_3_7()
 
 		write_checkpoint(testid)
 		

@@ -354,11 +354,11 @@ class GroupDriver :
 		obj_list = []
 		for i in range(self.m) :
 			obj_list.extend(container[i].driver.list_container_objects(container))
-		
+		obj_name_list = []
 		for i in obj_list :
-			if i.name[-5 : ] == '.meta' :
-				obj_name_set.append(os.path.splitext(i.name)[0])
-		
+			if cmp(i.name[-5 : ], '.meta') == 0 :
+				obj_name_list.append(os.path.splitext(i.name)[0])
+		obj_name_set = set(obj_name_list)
 		ret = [self.get_object(container_name, i) for i in obj_name_set ]
 		return ret
 
