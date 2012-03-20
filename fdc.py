@@ -27,10 +27,10 @@ def fdc_file(parts, block_size, k, m, file_name, file_dir, file_origin_size):
 	fdecoder = Decoder(k, m)
 	streams = []
 	streams.extend([""] * k)
-	file = open(file_dir  + file_name,'w')
+	file = open(file_dir ,'w')
 
-	files = [ open(file_dir  + file_name + '.' + str(i),'r') for i in parts ]
-	file_size = path.getsize(file_dir + file_name+'.'+str(parts[0])) * k
+	files = [ open(file_dir + '.' + str(i),'r') for i in parts ]
+	file_size = path.getsize(file_dir +'.'+str(parts[0])) * k
 	block_count = mathutil.div_ceil(file_size, block_size)
 
 	for count in range(block_count) :
@@ -51,7 +51,7 @@ def main():
 	k = 3
 	m = 5
 	parts = [0,1,2]
-	fdc_file(parts, block_size, k, m, file_name, './', 5201)
+	fdc_file(parts, block_size, k, m, file_name, './'+file_name, 5201)
 	
 if __name__ == '__main__' :
 	main()
