@@ -56,10 +56,10 @@ NineFold = get_driver(Provider.NINEFOLD)
 driver_ninefold = NineFold("f9946e04515a46cf98a998f2cb34dd3b/mlibcloud_1328774465274", "fRRs33RyQOmVOrB38UNqV+R3uAM=");
 
 S3_AP_SOUTHEAST = get_driver(Provider.S3_AP_SOUTHEAST)
-driver_s3_ap_southeast = S3_AP_SOUTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+driver_ap_southeast = S3_AP_SOUTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
 
 S3_AP_NORTHEAST = get_driver(Provider.S3_AP_NORTHEAST)
-driver_s3_ap_northeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+driver_ap_southeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
 
 Cloudfiles_UK = get_driver(Provider.CLOUDFILES_UK)
 driver_cloudfiles_uk = Cloudfiles_UK("mlibcloud0", "d544e3b4a183ba4d07777be6e6ce0b77")
@@ -187,13 +187,13 @@ def test_s3_us_west():
 	test_original(driver, container_name, server)
 
 def test_s3_ap_southeast():
-	driver = driver_s3_ap_southeast 
+	driver = driver_ap_southeast 
 	server = "original:S3_AP_SOUTHEAST"
 	container_name = "mlibclouds3apsoutheast"
 	test_original(driver, container_name, server)
 
 def test_s3_ap_northeast():
-	driver = driver_s3_ap_northeast
+	driver = driver_ap_northeast
 	server = "original:S3_AP_NORTHEAST"
 	container_name = "mlibclouds3apnortheast"
 	test_original(driver, container_name, server)
@@ -236,7 +236,7 @@ def test_ninefold():
 
 
 def test_mlibcloud_3_7():
-	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk, driver_s3ap_southeast, driver_ninefold])
+	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk, driver_s3_ap_southeast, driver_ninefold])
 	driver.set_original_share(3)
 	driver.set_total_share(7)
 	driver.set_block_size(512)
@@ -296,7 +296,7 @@ if __name__ == "__main__":
 	
 		#TODO
 		#test for mlibcloud
-		test_mlibcloud_3_5()
+#		test_mlibcloud_3_5()
 		test_mlibcloud_3_6()
 		test_mlibcloud_3_7()
 

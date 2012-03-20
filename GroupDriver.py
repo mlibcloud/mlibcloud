@@ -8,6 +8,7 @@ from mObject import mObject
 
 import threading
 import os
+import socket
 from libcloud.storage.providers import get_driver
 from libcloud.storage.types import Provider
 from mtimer import mtimer
