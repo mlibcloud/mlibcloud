@@ -236,7 +236,7 @@ def test_ninefold():
 
 
 def test_mlibcloud_3_7():
-	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk, driver_s3ap_southeast, driver_ninefold])
+	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk, driver_s3_ap_southeast, driver_ninefold])
 	driver.set_original_share(3)
 	driver.set_total_share(7)
 	driver.set_block_size(512)
@@ -296,7 +296,7 @@ if __name__ == "__main__":
 	
 		#TODO
 		#test for mlibcloud
-		test_mlibcloud_3_5()
+#		test_mlibcloud_3_5()
 		test_mlibcloud_3_6()
 		test_mlibcloud_3_7()
 
