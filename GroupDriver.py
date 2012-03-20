@@ -311,8 +311,9 @@ class GroupDriver :
 
 	def download_object(self, mobj, dest_path, overwrite_existing = True):
 		objs = mobj.objs
+		name_suffixs = [ os.path.splitext(i.name)[1] for i in objs] 
 		stripe_threads = [ download_object_thread(objs[i].driver, objs[i],
-												dest_path + objs[i].name,
+												dest_path + name_suffixs[i],
 												overwrite_existing)
 							for i in range(self.k) ]
 		for it in stripe_threads :
@@ -332,7 +333,7 @@ class GroupDriver :
 						retry_threads.append( 
 							download_object_thread(objs[pt].dirver,
 													objs[pt],
-													dest_path+objs[pt].name,
+													dest_path+name_suffixs[pt],
 													overwrite_existing))
 						pt += 1
 						retry = True

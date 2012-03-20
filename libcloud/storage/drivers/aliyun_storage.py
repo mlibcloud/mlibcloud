@@ -87,7 +87,7 @@ class AliyunStorageDriver(OssAPI):
 			raise ObjectDoesNotExistError(value = None, driver = self,
 				 object_name = object_name)
 
-	def download_object(self, obj, destination_path, overwrite_existing = False,
+	def download_object(self, obj, destination_path, overwrite_existing = True,
 						delete_on_failure = True) :
 		try :
 			file = open(destination_path,'w')
