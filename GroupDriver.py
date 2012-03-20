@@ -15,6 +15,7 @@ from libcloud.storage.types import Provider, ContainerDoesNotExistError
 from mtimer import mtimer
 from libcloud.storage.types import LibcloudError
 from libcloud.storage.types import InvalidContainerNameError
+from provider_dict import get_cloud_provider
 
 
 
@@ -81,7 +82,6 @@ class list_container_objects_thread(threading.Thread) :
 		self.container = container
 		self.obj_list = None
 
-
 	def run(self):
 		self.obj_list = self.container.driver.list_container_objects(self.container)
 
@@ -102,21 +102,30 @@ class GroupDriver :
 	def set_block_size(self, block_size):
 		self.block_size = block_size
 
+	def get_provider_list(self) :
+		provider_list = [ get_cloud_provider(d.__class__.name) 
+							for d in self.drivers ]
+		return provider_list
+
 	def create_container(self, container_name):
+
+		container_name_suffix = self.get_provider_list()
+
 		ret = [ None for i in range(self.m) ]
 		for i in range(self.m) :
 			try :
-				ret[i] = self.drivers[i].create_container(container_name)
+				ret[i] = self.drivers[i].create_container(container_name + container_name_suffix[i] )
 			except InvalidContainerNameError :
-				ret[i] = self.drivers[i].get_container(container_name)
+				ret[i] = self.drivers[i].get_container(container_name + container_name_suffix[i] )
 		return ret
 
 	def get_container(self, container_name):
 		#return a list of container
 		containers = [ None for i in range(self.m) ]
+		container_name_suffix = self.get_provider_list()
 		try :
 			for i in range(self.m) :
-				containers[i] = self.drivers[i].get_container(container_name)
+				containers[i] = self.drivers[i].get_container(container_name + container_name_suffix[i])
 		except ContainerDoesNotExistError :
 			raise 
 		
@@ -242,8 +251,11 @@ class GroupDriver :
 
 	def get_object(self, container_name, obj_name):
 		meta_name = obj_name + '.meta'
+		container_name_suffix = self.get_provider_list()
 		#get .meta objects 
-		meta_objs = [self.drivers[i].get_object(container_name, meta_name)
+		meta_objs = [self.drivers[i].get_object(
+								container_name+container_name_suffix[i], 
+								meta_name)
 					for i in range(len(self.drivers)) ]
 		
 		#dwonload .meta file
@@ -299,9 +311,15 @@ class GroupDriver :
 		obj_names = [obj_name + '.' + str(i[1]) for i in sorted_drivers ]
 		obj_drivers = [i[0] for i in sorted_drivers ]
 #		parts = [ sorted_drivers[i][1] for i in range(m) ]
+		
+		container_name_suffix = [ get_cloud_provider(obj_drivers[i].__class__.name)
+									for i in range(m) ]
 
-		obj_list = [ obj_drivers[i].get_object( container_name, obj_names[i])
-					for i in range(k) ]
+
+		obj_list = [ obj_drivers[i].get_object(
+							container_name + container_name_suffix[i], 
+							obj_names[i])
+					for i in range(m) ]
 
 		ret = mObject(obj_name, file_size, None, {} ,meta, obj_list, 
 						container_name, obj_drivers )
@@ -388,10 +406,8 @@ class GroupDriver :
 
 
 	def list_container_objects(self, container):
-		#container is a list of containers,values in the containers are the same except container.driver
-		#a container_name is unique to a GroupDriver
+		#container is a list of containers
 		ret = None
-		container_name = container[0].name
 		obj_list = []
 		list_threads = [list_container_objects_thread(container[i]) 
 						for i in range(self.m) ]
@@ -409,14 +425,17 @@ class GroupDriver :
 			if cmp(i.name[-5 : ], '.meta') == 0 :
 				obj_name_list.append(os.path.splitext(i.name)[0])
 		obj_name_set = set(obj_name_list)
-		ret = [self.get_object(container_name, i) for i in obj_name_set ]
+		ret = [self.get_object(container[i].name, obj_name_set[i]) 
+				for i in range(len(obj_name_set)) ]
 		return ret
 
 
 	def delete_object(self, mobj):
 		#delete .meta file
 		for d in mobj.drivers :
-			d.delete_object(d.get_object(mobj.container_name, mobj.name))
+			d.delete_object(d.get_object(mobj.container_name +
+										get_cloud_provider(d.__class__.name), 
+										mobj.name))
 		
 		#delete file stripes
 		ret = [ d.delete_object(mobj.objs[i]) 
