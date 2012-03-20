@@ -109,7 +109,7 @@ class GroupDriver :
 
 	def create_container(self, container_name):
 
-		container_name_suffix = self.get_provider_list()
+		container_name_suffix = [ str(i) for i in self.get_provider_list() ]
 
 		ret = [ None for i in range(self.m) ]
 		for i in range(self.m) :
@@ -122,7 +122,7 @@ class GroupDriver :
 	def get_container(self, container_name):
 		#return a list of container
 		containers = [ None for i in range(self.m) ]
-		container_name_suffix = self.get_provider_list()
+		container_name_suffix = [str(i) for i in self.get_provider_list() ]
 		try :
 			for i in range(self.m) :
 				containers[i] = self.drivers[i].get_container(container_name + container_name_suffix[i])
@@ -251,7 +251,7 @@ class GroupDriver :
 
 	def get_object(self, container_name, obj_name):
 		meta_name = obj_name + '.meta'
-		container_name_suffix = self.get_provider_list()
+		container_name_suffix = [str(i) for i in self.get_provider_list() ]
 		#get .meta objects 
 		meta_objs = [self.drivers[i].get_object(
 								container_name+container_name_suffix[i], 
@@ -424,7 +424,7 @@ class GroupDriver :
 		for i in obj_list :
 			if cmp(i.name[-5 : ], '.meta') == 0 :
 				obj_name_list.append(os.path.splitext(i.name)[0])
-		obj_name_set = set(obj_name_list)
+		obj_name_set = list(set(obj_name_list))
 		ret = [self.get_object(container[i].name, obj_name_set[i]) 
 				for i in range(len(obj_name_set)) ]
 		return ret
