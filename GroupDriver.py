@@ -86,8 +86,10 @@ class GroupDriver :
 		self.block_size = block_size
 
 	def create_container(self, container_name):
-		for d in self.drivers :
-			d.create_container(container_name)
+		ret = None
+		ret = [d.create_container(container_name) 
+				for d in self.drivers ]
+		return ret
 
 	def get_container(self, container_name):
 		#return a list of container
