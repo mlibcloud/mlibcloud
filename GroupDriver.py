@@ -312,7 +312,7 @@ class GroupDriver :
 		obj_drivers = [i[0] for i in sorted_drivers ]
 #		parts = [ sorted_drivers[i][1] for i in range(m) ]
 		
-		container_name_suffix = [ get_cloud_provider(obj_drivers[i].__class__.name)
+		container_name_suffix = [ str(get_cloud_provider(obj_drivers[i].__class__.name))
 									for i in range(m) ]
 
 
@@ -401,7 +401,10 @@ class GroupDriver :
 
 		#delete file stripes 
 		for i in name_suffixs :
-			os.remove('./temp/' + file_name + i)
+			try:
+				os.remove('./temp/' + file_name + i)
+			except OSError:
+				None
 		
 
 
@@ -425,7 +428,9 @@ class GroupDriver :
 			if cmp(i.name[-5 : ], '.meta') == 0 :
 				obj_name_list.append(os.path.splitext(i.name)[0])
 		obj_name_set = list(set(obj_name_list))
-		ret = [self.get_object(container[i].name, obj_name_set[i]) 
+		name_suffix = str(get_cloud_provider(container[0].driver.__class__.name))
+		container_name = container[0].name[:len(container[0].name) - len(name_suffix)]
+		ret = [self.get_object(container_name, obj_name_set[i]) 
 				for i in range(len(obj_name_set)) ]
 		return ret
 

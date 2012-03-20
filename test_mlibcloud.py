@@ -152,6 +152,11 @@ def test_original(driver, container_name, server):
 	#prefer to download from other client uploads	
 	if len(down_dic) > 1 and down_dic.has_key(location):
 		down_dic.pop(location)
+
+	if len(down_dic) == 0:
+		print("down dic is empty!!")
+		return
+
 	#randomly pick a group to download
 	info_tuple = random.choice(down_dic.items())	
 	to_down_objects = []
@@ -250,7 +255,7 @@ def test_mlibcloud_3_6():
 	driver.set_total_share(6)
 	driver.set_block_size(512)
 	server = "mLibCloud:ALI$AZURE_US$GOOGLESTORAGE$S3_US_WEST$CLOUDFILES_UK$S3_AP_SOUTHEAST:3$6"
-	container_name = "mlibcloud360"
+	container_name = "mlibcloud36"
 	test_original(driver, container_name, server)
 
 def test_mlibcloud_3_5():
@@ -296,7 +301,7 @@ if __name__ == "__main__":
 	
 		#TODO
 		#test for mlibcloud
-#		test_mlibcloud_3_5()
+		test_mlibcloud_3_5()
 		test_mlibcloud_3_6()
 		test_mlibcloud_3_7()
 
