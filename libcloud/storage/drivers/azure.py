@@ -216,7 +216,7 @@ class AzureStorageDriver(StorageDriver) :
 	def download_object(self, obj, destination_path, overwrite_existing = False,
 						delete_on_failure = True) :
 		try :
-			file = open(destination_path + obj.name,'w')
+			file = open(destination_path,'w')
 			req = Request("%s/%s/%s" % (self.get_base_url(), obj.container.name, obj.name))
 			self._credentials.sign_request(req)
 			file.write(urlopen(req).read())
