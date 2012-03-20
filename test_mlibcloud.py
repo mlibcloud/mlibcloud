@@ -245,12 +245,12 @@ def test_mlibcloud_3_7():
 	test_original(driver, container_name, server)
 
 def test_mlibcloud_3_6():
-	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk, driver_s3_ap_southeast])
+	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_s3_ap_southeast, driver_cloudfiles_uk])
 	driver.set_original_share(3)
 	driver.set_total_share(6)
 	driver.set_block_size(512)
 	server = "mLibCloud:ALI$AZURE_US$GOOGLESTORAGE$S3_US_WEST$CLOUDFILES_UK$S3_AP_SOUTHEAST:3$6"
-	container_name = "mlibcloud36"
+	container_name = "mlibcloud360"
 	test_original(driver, container_name, server)
 
 def test_mlibcloud_3_5():
@@ -278,7 +278,7 @@ if __name__ == "__main__":
 		#test for s3_us_west()
 #		test_s3_us_west()	
 	
-#		test_s3_ap_southeast()
+		#test_s3_ap_southeast()
 		
 #		test_s3_ap_northeast()
 
