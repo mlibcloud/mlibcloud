@@ -56,10 +56,10 @@ NineFold = get_driver(Provider.NINEFOLD)
 driver_ninefold = NineFold("f9946e04515a46cf98a998f2cb34dd3b/mlibcloud_1328774465274", "fRRs33RyQOmVOrB38UNqV+R3uAM=");
 
 S3_AP_SOUTHEAST = get_driver(Provider.S3_AP_SOUTHEAST)
-driver_ap_southeast = S3_AP_SOUTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+driver_s3_ap_southeast = S3_AP_SOUTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
 
 S3_AP_NORTHEAST = get_driver(Provider.S3_AP_NORTHEAST)
-driver_ap_southeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+driver_s3_ap_southeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
 
 Cloudfiles_UK = get_driver(Provider.CLOUDFILES_UK)
 driver_cloudfiles_uk = Cloudfiles_UK("mlibcloud0", "d544e3b4a183ba4d07777be6e6ce0b77")
@@ -187,7 +187,7 @@ def test_s3_us_west():
 	test_original(driver, container_name, server)
 
 def test_s3_ap_southeast():
-	driver = driver_ap_southeast 
+	driver = driver_s3_ap_southeast 
 	server = "original:S3_AP_SOUTHEAST"
 	container_name = "mlibclouds3apsoutheast"
 	test_original(driver, container_name, server)
