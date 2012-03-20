@@ -12,6 +12,7 @@ from libcloud.storage.providers import get_driver
 from libcloud.storage.types import Provider
 from mtimer import mtimer
 from libcloud.storage.types import LibcloudError
+from libcloud.storage.types import InvalidContainerNameError
 
 
 
@@ -101,7 +102,7 @@ class GroupDriver :
 		for i in range(self.m) :
 			try :
 				ret[i] = self.drivers[i].create_container(container_name)
-			except LibcloudError :
+			except InvalidContainerNameError :
 				ret[i] = self.drivers[i].get_container(container_name)
 		return ret
 
@@ -113,6 +114,8 @@ class GroupDriver :
 				containers[i] = self.drivers[i].get_container(container_name)
 		except ContainerDoesNotExistError :
 			raise ContainerDeosNotExistError
+		
+		return containers
 
 	def upload_object(self, file_path, container, obj_name, extra = None) :
 		file_name = os.path.basename(file_path)
