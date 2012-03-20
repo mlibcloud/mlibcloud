@@ -306,14 +306,19 @@ class GroupDriver :
 		file_size = meta["size"]
 		block_size = meta["blocksize"]
 		stripe_location = { 's' + str(i) : meta["s" + str(i)] for i in range(m) }
-		print("read from meta completa")
+		print("read from meta complete")
 		return (k, m, file_size, block_size, stripe_location)
 
 	def download_object(self, mobj, dest_path, overwrite_existing = True):
+		file_name = mobj.name
 		objs = mobj.objs
 		name_suffixs = [ os.path.splitext(i.name)[1] for i in objs] 
+
+		if not os.path.exists('./temp'):
+			os.mkdir('./temp')
+
 		stripe_threads = [ download_object_thread(objs[i].driver, objs[i],
-												dest_path + name_suffixs[i],
+												'./temp/'+ file_name + name_suffixs[i],
 												overwrite_existing)
 							for i in range(self.k) ]
 		for it in stripe_threads :
@@ -332,9 +337,9 @@ class GroupDriver :
 					if pt < self.m :
 						retry_threads.append( 
 							download_object_thread(objs[pt].dirver,
-													objs[pt],
-													dest_path+name_suffixs[pt],
-													overwrite_existing))
+												objs[pt],
+												'./temp/'+file_name+name_suffixs[pt],
+												overwrite_existing))
 						pt += 1
 						retry = True
 					else :
@@ -360,6 +365,10 @@ class GroupDriver :
 		#fdc_file
 		fdc_file(parts, self.block_size, self.k, self.m, mobj.name, dest_path, mobj.size)
 		print("fdc_file complete")
+
+		#delete file stripes 
+		for i in name_suffixs :
+			os.remove('./temp/' + file_name + i)
 		
 
 
