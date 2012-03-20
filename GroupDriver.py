@@ -97,16 +97,22 @@ class GroupDriver :
 		self.block_size = block_size
 
 	def create_container(self, container_name):
-		ret = None
-		ret = [d.create_container(container_name) 
-				for d in self.drivers ]
+		ret = [ None for i in range(self.m) ]
+		for i in range(self.m) :
+			try :
+				ret[i] = self.drivers[i].create_container(container_name)
+			except LibcloudError :
+				ret[i] = self.drivers[i].get_container(container_name)
 		return ret
 
 	def get_container(self, container_name):
 		#return a list of container
-		containers = None
-		containers = [ d.get_container(container_name) for d in self.drivers ]
-		return containers
+		containers = [ None for i in range(self.m) ]
+		try :
+			for i in range(self.m) :
+				containers[i] = self.drivers[i].get_container(container_name)
+		except ContainerDoesNotExistError :
+			raise ContainerDeosNotExistError
 
 	def upload_object(self, file_path, container, obj_name, extra = None) :
 		file_name = os.path.basename(file_path)
