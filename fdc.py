@@ -40,7 +40,7 @@ def fdc_file(parts, block_size, k, m, file_name, file_dir, file_origin_size):
 		results = fdecoder.decode(streams, parts)
 		for i in range(len(results)) :
 			file.write(results[i])
-#	file.truncate(file_origin_size)
+	file.truncate(file_origin_size)
 	file.close()
 
 def main():

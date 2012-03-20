@@ -32,8 +32,11 @@ def fec_file(file, block_size, k, m):
 	#the last round
 	for i in range(block_count % k):
 		ds[i] = file.read(block_size)
-	for index in range(i,k):
+
+	ds[i] = ds[i] + "\x00" * (block_size - len(ds[i]))
+	for index in range(i+1,k):
 		ds[index] = "\x00" * (len(ds[0]))
+
 	temp = fencoder.encode(ds)
 	for j in range(m):
 		results[j] = results[j] + temp[j]
