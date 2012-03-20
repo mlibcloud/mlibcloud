@@ -355,7 +355,7 @@ class GroupDriver :
 		container_name = container[0].name
 		obj_list = []
 		for i in range(self.m) :
-			obj_list.extend(container[i].driver.list_container_objects(container))
+			obj_list.extend(container[i].driver.list_container_objects(container[i]))
 		obj_name_list = []
 		for i in obj_list :
 			if cmp(i.name[-5 : ], '.meta') == 0 :
