@@ -1,4 +1,5 @@
 from key_secret_dict import read_keys_from_file
+import socket
 import md5
 from fec import fec_file
 from fdc import fdc_file
@@ -10,7 +11,7 @@ import threading
 import os
 import socket
 from libcloud.storage.providers import get_driver
-from libcloud.storage.types import Provider
+from libcloud.storage.types import Provider, ContainerDoesNotExistError
 from mtimer import mtimer
 from libcloud.storage.types import LibcloudError
 from libcloud.storage.types import InvalidContainerNameError
@@ -35,8 +36,11 @@ class upload_object_thread(threading.Thread):
 			if not self.ret :
 				raise LibcloudError("upload %s failed" %self.obj_name, driver = self.driver)
 
-		except (LibcloudError, socket.error ): 
+		except LibcloudError, e: 
 			print("upload error")
+			print(e)
+			self.ret = False
+		except socket, e:
 			self.ret = False
 
 
@@ -114,7 +118,7 @@ class GroupDriver :
 			for i in range(self.m) :
 				containers[i] = self.drivers[i].get_container(container_name)
 		except ContainerDoesNotExistError :
-			raise ContainerDeosNotExistError
+			raise 
 		
 		return containers
 
@@ -160,6 +164,7 @@ class GroupDriver :
 
 		for it in stripe_threads :
 			if not it.ret :
+				print it.driver.__class__.name		
 				raise LibcloudError("upload stripes failed", driver = self)
 				break
 
