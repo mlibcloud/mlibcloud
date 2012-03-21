@@ -322,7 +322,7 @@ class GroupDriver :
 					for i in range(m) ]
 
 		ret = mObject(obj_name, file_size, None, {} ,meta, obj_list, 
-						container_name, obj_drivers )
+						container_name, self, True )
 		return ret
 
 	
@@ -427,27 +427,41 @@ class GroupDriver :
 		for i in obj_list :
 			if cmp(i.name[-5 : ], '.meta') == 0 :
 				obj_name_list.append(os.path.splitext(i.name)[0])
+
 		obj_name_set = list(set(obj_name_list))
 		name_suffix = str(get_cloud_provider(container[0].driver.__class__.name))
 		container_name = container[0].name[:len(container[0].name) - len(name_suffix)]
-		ret = [self.get_object(container_name, obj_name_set[i]) 
-				for i in range(len(obj_name_set)) ]
-		return ret
 
+#		ret = [self.get_object(container_name, obj_name_set[i]) 
+#				for i in range(len(obj_name_set)) ]
+#		return ret
+
+		ret = [ mObject(i , None, None, {}, None, None, container_name, self, False)
+				for i in obj_name_set ]
+		print("list_container_object complete")
+		return ret
 
 	def delete_object(self, mobj):
 		#delete .meta file
-		for d in mobj.drivers :
+		for d in mobj.driver.drivers :
 			d.delete_object(d.get_object(mobj.container_name +
 										get_cloud_provider(d.__class__.name), 
 										mobj.name))
 		
 		#delete file stripes
 		ret = [ d.delete_object(mobj.objs[i]) 
-				for d in mobj.drivers ]			
+				for d in mobj.driver.drivers ]			
 		for it in ret :
 			if not it :
 				return False
 		return True
+
+
+	def integrate(self, mobj):
+		if mobj.integrated :
+			return mobj
+		ret = self.get_object(mobj.container_name, mobj.name)
+		return ret
+
 
 

@@ -173,6 +173,8 @@ def test_original(driver, container_name, server):
 		start_time = time.time()
 		try:
 			f_group.append(o.name)
+			if not o.integrated :
+				o = driver.integrate(o)
 			driver.download_object(o, o.name, True)
 			end_time = time.time()
 		except LibcloudError, ObjectHashMismatchError:
@@ -301,9 +303,9 @@ if __name__ == "__main__":
 	
 		#TODO
 		#test for mlibcloud
-		test_mlibcloud_3_5()
+#		test_mlibcloud_3_5()
 		test_mlibcloud_3_6()
-		test_mlibcloud_3_7()
+#		test_mlibcloud_3_7()
 
 		write_checkpoint(testid)
 		
