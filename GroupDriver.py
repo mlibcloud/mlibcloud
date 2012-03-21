@@ -343,6 +343,8 @@ class GroupDriver :
 		return (k, m, file_size, block_size, stripe_location)
 
 	def download_object(self, mobj, dest_path, overwrite_existing = True):
+		if not mobj.integrated:
+			mobj = self.get_object(mobj.container_name, mobj.name)
 		file_name = mobj.name
 		objs = mobj.objs
 		name_suffixs = [ os.path.splitext(i.name)[1] for i in objs] 
