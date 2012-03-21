@@ -17,7 +17,9 @@ from libcloud.storage.types import LibcloudError
 from libcloud.storage.types import InvalidContainerNameError
 from provider_dict import get_cloud_provider
 
+from TestLogger import TestLogger
 
+DEBUG = True
 
 class upload_object_thread(threading.Thread):
 	
@@ -29,11 +31,18 @@ class upload_object_thread(threading.Thread):
 		self.obj_name = obj_name
 		self.extra = extra
 		self.ret = False
+		if DEBUG :
+			self.dmt = mtimer(self.driver.__class__.name, container.name, obj_name)
 
 	def run(self):
+		if DEBUG:
+			self.dmt.begin()
 		try:
 			ret = self.driver.upload_object(self.file_path, self.container, self.obj_name, extra = self.extra)
 			self.ret = ret != None and True or False
+			if DEBUG :
+				self.dmt.end()
+				
 			if not self.ret :
 				raise LibcloudError("upload %s failed" %self.obj_name, driver = self.driver)
 
@@ -41,8 +50,12 @@ class upload_object_thread(threading.Thread):
 			print("upload error")
 			print(e)
 			self.ret = False
+			if DEBUG:
+				self.dmt.end()
 		except socket, e:
 			self.ret = False
+			if DEBUG:
+				self.dmt.end()
 
 
 class download_object_thread(threading.Thread):
@@ -54,7 +67,13 @@ class download_object_thread(threading.Thread):
 		self.timing = timing
 		self.ret = False
 		self.owe = overwrite_existing
+		if DEBUG:
+			self.dmt = mtimer(self.driver.__class__.name, obj.container.name, obj.name)
+
 	def run(self):
+		if DEBUG:
+			self.dmt.begin()
+
 		ret = False
 		print(self.dest_path)
 		if self.timing :
@@ -67,6 +86,8 @@ class download_object_thread(threading.Thread):
 				mt.end()
 				self.time = mt.get_interval()
 				self.name = mt.name
+			if DEBUG:
+				self.dmt.end()
 			if not self.ret :
 				raise LibcloudError("download %s failed " %self.obj.name , driver = self.driver )
 		except (LibcloudError, socket.error):
@@ -75,18 +96,30 @@ class download_object_thread(threading.Thread):
 			if self.timing :
 				self.time = float(9999999999)
 				self.name = mt.name
+			if DEBUG:
+				self.dmt.end()
+
+
 
 class list_container_objects_thread(threading.Thread) :
 	def __init__(self, container):
 		threading.Thread.__init__(self)
 		self.container = container
 		self.obj_list = None
+		if DEBUG:
+			self.dmt = mtimer(container.driver.__class__.name, container.name, None)
 
 	def run(self):
+		if DEBUG:
+			self.dmt.begin()
 		self.obj_list = self.container.driver.list_container_objects(self.container)
+		if DEBUG:
+			self.dmt.end()
 
 
 class GroupDriver :
+	
+	name = "GroupDriver"
 	
 	def __init__(self, driver_list):
 		self.drivers = driver_list
@@ -108,6 +141,9 @@ class GroupDriver :
 		return provider_list
 
 	def create_container(self, container_name):
+		if DEBUG:
+			dmt = mtimer(self.__class__.name, container_name, None)
+			dmt.begin()
 
 		container_name_suffix = [ str(i) for i in self.get_provider_list() ]
 
@@ -117,28 +153,56 @@ class GroupDriver :
 				ret[i] = self.drivers[i].create_container(container_name + container_name_suffix[i] )
 			except InvalidContainerNameError :
 				ret[i] = self.drivers[i].get_container(container_name + container_name_suffix[i] )
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("create_conainer\t" + dmt.get_info() + "\t" + "True")
+
 		return ret
 
 	def get_container(self, container_name):
 		#return a list of container
+		if DEBUG:
+			dmt = mtimer(self.__class__.name, container_name, None)
+			dmt.begin()
+
 		containers = [ None for i in range(self.m) ]
 		container_name_suffix = [str(i) for i in self.get_provider_list() ]
 		try :
 			for i in range(self.m) :
 				containers[i] = self.drivers[i].get_container(container_name + container_name_suffix[i])
 		except ContainerDoesNotExistError :
+			if DEBUG:
+				dmt.end()
+				TestLogger.getInstance().log_sentence("get_conainer\t" + dmt.get_info() + "\t" + "False")
 			raise 
-		
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("get_conainer\t" + dmt.get_info() + "\t" + "True")
+	
 		return containers
 
 	def upload_object(self, file_path, container, obj_name, extra = None) :
+		if DEBUG:
+			dmt = mtimer(self.__class__.name, "conainer_list", obj_name)
+			dmt.begin()
+
 		file_name = os.path.basename(file_path)
 		file = open(file_path,'r')
 		streams = fec_file(file, self.block_size, self.k, self.m)
 		write_streams_to_file(streams,file_path)
 		print("fec file complete")
+
+		if DEBUG:
+			dmt.end()
+			#operation   driver   container   object   successornot
+			TestLogger.getInstance().log_sentence("upload_object.fec"+ "\t" + dmt.get_info() + '\t' + "True")
 		
 		#generate .meta file
+		if DEBUG:
+			dmt.begin()
+
 		meta = FileMeta()
 		meta.set_name(file_name)
 		meta.set_size(os.path.getsize(file_path))
@@ -157,8 +221,17 @@ class GroupDriver :
 	
 		meta.save_to_file(file_path+'.meta')
 		print("save meta complete")
+
+		if DEBUG:
+			dmt.end()
+			#operation   driver   container   object   successornot
+			TestLogger.getInstance().log_sentence("upload_object.gen_save_meta"+ "\t" + dmt.get_info() + '\t' + "True")
+
 	
 		#threading upload
+		if DEBUG:
+			dmt.begin()
+
 		stripe_threads = [upload_object_thread(self.drivers[i],
 									 file_path+'.'+str(i),
 									 container[i],
@@ -170,6 +243,16 @@ class GroupDriver :
 			it.start()
 		for it in stripe_threads :
 			it.join()
+
+		if DEBUG:
+			for it in stripe_threads :
+				#operation   dirver   container_name   start_time   end_time   successornot
+				TestLogger.getInstance().log_sentence("upload_object.objs_thread" + "\t" + it.dmt.get_info() + '\t' + str(it.ret))
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("upload_object.objs\t" + dmt.get_info() + "\t" + "None")
+
 
 		for it in stripe_threads :
 			if not it.ret :
@@ -202,6 +285,9 @@ class GroupDriver :
 
 
 		#upload .meta to cloud
+		if DEBUG:
+			dmt.begin()
+
 		meta_threads = [upload_object_thread(self.drivers[i],
 										file_path+'.meta',
 										container[i],
@@ -212,6 +298,17 @@ class GroupDriver :
 			it.start()
 		for it in meta_threads :
 			it.join()
+
+		if DEBUG:
+			for it in meta_threads :
+				#operation  driver_name   container_name  obj_name  start_time   end_time   successornot
+				TestLogger.getInstance().log_sentence("upload_object.metas_thread"+ "\t" + it.dmt.get_info() + '\t' + str(it.ret))
+
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("upload_object.metas\t" + dmt.get_info() + "\t" + "None")
+
 
 		for it in meta_threads :
 			if not it.ret :
@@ -253,12 +350,23 @@ class GroupDriver :
 		meta_name = obj_name + '.meta'
 		container_name_suffix = [str(i) for i in self.get_provider_list() ]
 		#get .meta objects 
+
+		if DEBUG:
+			dmt = mtimer(self.__class__.name, container_name, obj_name)
+			dmt.begin()
+
 		meta_objs = [self.drivers[i].get_object(
 								container_name+container_name_suffix[i], 
 								meta_name)
 					for i in range(len(self.drivers)) ]
-		
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("get_object.get_metas"+ "\t" + dmt.get_info() + '\t' + "True")	
+
 		#dwonload .meta file
+		if DEBUG:
+			dmt.begin()
+
 		if not os.path.exists('./temp'):
 			os.mkdir('./temp')
 		dest_path = './temp/'
@@ -271,10 +379,24 @@ class GroupDriver :
 			it.start()
 		for it in meta_threads :
 			it.join()
+
+		if DEBUG:
+			for it in meta_threads :
+				TestLogger.getInstance().log_sentence("get_objects.download_metas_thread\t" + it.dmt.get_info() + '\t' + str(it.ret))
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("get_objects.download_metas\t" + dmt.get_info() + '\t' + "None")
+
+
 		#driver_times {driver_name : driver_time }
 		driver_times = {it.name : it.time for it in meta_threads }
 		
 		#check meta files
+		if DEBUG:
+			dmt.begin()
+
+
 		meta = None
 		for i in range(len(self.drivers)):
 			if not self.check_meta( dest_path + meta_name + '.' + str(i)):
@@ -298,7 +420,12 @@ class GroupDriver :
 		for i in range(m) :
 			os.remove('./temp/' + meta_name + '.' + str(i))
 
-		#download k file stripes,according to download speed
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("get_object.check_getinfo_from_meta\t" + dmt.get_info() + "\t" + "None")
+
+		if DEBUG:
+			dmt.begin()
 		#temp is a list of  (provider , i, cost_time) sorted by cost_time ,i means the ith stripe
 		temp = [ (	stripe_location['s' + str(i)], i, 
 					driver_times[stripe_location['s' + str(i)]] )
@@ -323,6 +450,11 @@ class GroupDriver :
 
 		ret = mObject(obj_name, file_size, None, {} ,meta, obj_list, 
 						container_name, self, True )
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("get_object.strategy\t" + dmt.get_info() + "\t" + "True")
+
 		return ret
 
 	
@@ -343,14 +475,29 @@ class GroupDriver :
 		return (k, m, file_size, block_size, stripe_location)
 
 	def download_object(self, mobj, dest_path, overwrite_existing = True):
+
+		if DEBUG:
+			dmt = mtimer(self.__class__.name, mobj.container_name, mobj.name)
+
 		if not mobj.integrated:
+			if DEBUG:
+				dmt.begin()
 			mobj = self.get_object(mobj.container_name, mobj.name)
+			if DEBUG:
+				dmt.end()
+				TestLogger.getInstance().log_sentence("download_object.not_integrated_mobj_get\t" + dmt.get_info() + "\t" + "True")
+
+	
 		file_name = mobj.name
 		objs = mobj.objs
 		name_suffixs = [ os.path.splitext(i.name)[1] for i in objs] 
 
 		if not os.path.exists('./temp'):
 			os.mkdir('./temp')
+
+		if DEBUG:
+			dmt.begin()
+
 
 		stripe_threads = [ download_object_thread(objs[i].driver, objs[i],
 												'./temp/'+ file_name + name_suffixs[i],
@@ -360,6 +507,12 @@ class GroupDriver :
 			it.start()
 		for it in stripe_threads :
 			it.join()
+
+
+		if DEBUG:
+			for it in stripe_threads :
+				#upload/download   dirver   container_name   start_time   end_time   successornot
+				TestLogger.getInstance().log_sentence("download_object.objs_thread\t" + it.dmt.get_info() + '\t' + str(it.ret))
 
 
 		success_objs = []
@@ -391,6 +544,17 @@ class GroupDriver :
 			for it in stripe_threads :
 				it.join()
 
+			if DEBUG:
+				for it in stripe_threads :
+					#upload/download   dirver   container_name   start_time   end_time   successornot
+					TestLogger.getInstance().log_sentence("download_object.objs_thread\t" + it.dmt.get_info() + '\t' + str(it.ret))
+
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("download_object.objs\t" + dmt.get_info() + "\t" + "None")
+
+
 		if not (pt < self.m) :
 			print("download stripes failed")
 			raise LibcloudError("download stripes failed", driver = self )
@@ -398,7 +562,16 @@ class GroupDriver :
 		parts = [ int(os.path.splitext(i.name)[1][1:]) for i in success_objs ]
 
 		#fdc_file
+		if DEBUG:
+			dmt.begin()
+
 		fdc_file(parts, self.block_size, self.k, self.m, mobj.name, dest_path, mobj.size)
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("download_object.fdc\t" + dmt.get_info() + "\t" + "True")
+
+
 		print("fdc_file complete")
 
 		#delete file stripes 
@@ -412,6 +585,10 @@ class GroupDriver :
 
 	def list_container_objects(self, container):
 		#container is a list of containers
+		if DEBUG:
+			dmt = mtimer(self.__class__.name,"container_list",None)
+			dmt.begin()
+
 		ret = None
 		obj_list = []
 		list_threads = [list_container_objects_thread(container[i]) 
@@ -421,6 +598,15 @@ class GroupDriver :
 			it.start()
 		for it in list_threads :
 			it.join()
+
+		if DEBUG:
+			for it in list_threads :
+				TestLogger.getInstance().log_sentence("list_container.list_threads\t" + it.dmt.get_info() + "\t" + "None")
+
+		if DEBUG:
+			dmt.end()
+			TestLogger.getInstance().log_sentence("list_conainer.list\t" + dmt.get_info() + "\t" + "None")
+
 
 		for it in list_threads :
 			obj_list.extend(it.obj_list)
