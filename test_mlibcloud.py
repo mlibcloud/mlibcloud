@@ -129,8 +129,12 @@ def test_original(driver, container_name, server):
 	objects = []
 	try:
 		objects = driver.list_container_objects(container)	
-	except LibcloudError, socket.error:
+	except LibcloudError:
 		None
+		return
+	except socket.error:
+		None
+		return
 
 	down_dic = {}
 	for o in objects:
@@ -173,8 +177,6 @@ def test_original(driver, container_name, server):
 		start_time = time.time()
 		try:
 			f_group.append(o.name)
-			if not o.integrated :
-				o = driver.integrate(o)
 			driver.download_object(o, o.name, True)
 			end_time = time.time()
 		except LibcloudError, ObjectHashMismatchError:
