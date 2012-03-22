@@ -634,7 +634,7 @@ class GroupDriver :
 		for d in mobj.driver.drivers :
 			d.delete_object(d.get_object(mobj.container_name +
 										str(get_cloud_provider(d.__class__.name)), 
-										mobj.name))
+										mobj.name+'.meta'))
 		
 		#delete file stripes
 		ret = [ d.delete_object(mobj.objs[i]) 
