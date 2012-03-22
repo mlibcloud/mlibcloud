@@ -633,7 +633,7 @@ class GroupDriver :
 		#delete .meta file
 		for d in mobj.driver.drivers :
 			d.delete_object(d.get_object(mobj.container_name +
-										get_cloud_provider(d.__class__.name), 
+										str(get_cloud_provider(d.__class__.name)), 
 										mobj.name))
 		
 		#delete file stripes
