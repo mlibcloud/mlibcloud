@@ -637,8 +637,9 @@ class GroupDriver :
 										mobj.name+'.meta'))
 		
 		#delete file stripes
-		ret = [ d.delete_object(mobj.objs[i]) 
-				for d in mobj.driver.drivers ]			
+		ret = [ mobj.drivers.drivers[i].delete_object(mobj.objs[i])
+				for i in range(len(mobj.driver.drivers)) ]
+
 		for it in ret :
 			if not it :
 				return False
