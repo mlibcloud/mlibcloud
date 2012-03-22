@@ -630,6 +630,7 @@ class GroupDriver :
 		return ret
 
 	def delete_object(self, mobj):
+		mobj = self.integrate(mobj)
 		#delete .meta file
 		for d in mobj.driver.drivers :
 			d.delete_object(d.get_object(mobj.container_name +
@@ -637,6 +638,7 @@ class GroupDriver :
 										mobj.name+'.meta'))
 		
 		#delete file stripes
+		print(len(mobj.driver.drivers))
 		ret = [ mobj.driver.drivers[i].delete_object(mobj.objs[i])
 				for i in range(len(mobj.driver.drivers)) ]
 
@@ -645,12 +647,58 @@ class GroupDriver :
 				return False
 		return True
 
-
 	def integrate(self, mobj):
 		if mobj.integrated :
 			return mobj
 		ret = self.get_object(mobj.container_name, mobj.name)
 		return ret
 
+
+
+
+
+
+def main():
+	Ali = get_driver(Provider.ALIYUN_STORAGE)
+	driver_ali = Ali("hqxxyywptpn3juer4zd5rods", "WfUMI6vw28r0GD4gwPtNRpS/unU=")
+
+	Azure = get_driver(Provider.WINDOWS_AZURE_STORAGE)
+	driver_azure_us = Azure("mlibcloud", "qdLKg2Cu1cWOkItbqb6gTl1WcOxvA9ED3fPo1KbSwdKw9ApJMhVEbyklurrBK23r8pTf6ajLN9tueSj5gVpiNQ==")
+
+	GoogleStorage = get_driver(Provider.GOOGLE_STORAGE)
+	driver_google_storage = GoogleStorage("GOOGULXCXRFPGQNEFPTE", "ys9om0uf2dYlXov4NOjO8jzGXLdtR7pwv9/nIK1V")
+
+	S3_US_WEST = get_driver(Provider.S3_US_WEST)
+	driver_s3_us_west = S3_US_WEST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+
+	NineFold = get_driver(Provider.NINEFOLD)
+	driver_ninefold = NineFold("f9946e04515a46cf98a998f2cb34dd3b/mlibcloud_1328774465274", "fRRs33RyQOmVOrB38UNqV+R3uAM=");
+
+	S3_AP_SOUTHEAST = get_driver(Provider.S3_AP_SOUTHEAST)
+	driver_s3_ap_southeast = S3_AP_SOUTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+
+	S3_AP_NORTHEAST = get_driver(Provider.S3_AP_NORTHEAST)
+	driver_s3_ap_southeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+
+	Cloudfiles_UK = get_driver(Provider.CLOUDFILES_UK)
+	driver_cloudfiles_uk = Cloudfiles_UK("mlibcloud0", "d544e3b4a183ba4d07777be6e6ce0b77")
+
+	Cloudfiles_US = get_driver(Provider.CLOUDFILES_US)
+	driver_cloudfiles_us = Cloudfiles_US("mlibcloud", "5140858194409ed2dd2ec13e008ac754")
+
+	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk])
+	driver.set_original_share(3)
+	driver.set_total_share(5)
+	driver.set_block_size(512)
+	container_name = "mlibcloud35"
+	object_name = 'Beijing_1_1048576'
+	object = driver.get_object(container_name, object_name)
+	driver.delete_object(object)
+
+
+
+
+if __name__ == '__main__':
+	main()
 
 
