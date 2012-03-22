@@ -110,20 +110,20 @@ def test_original(driver, container_name, server):
 		container = driver.create_container(container_name)
 	
 	#test for upload
-#	f_group = RandomFile.create_group(location, testid)
-#	for f_path in f_group:
-#		start_time = time.time()
-#		try:
-#			driver.upload_object(f_path, container, f_path, {"content_type": "application/octo-stream"})
-#			end_time = time.time()
-#		except  LibcloudError, ObjectHashMismatchError:
-#			end_time = -1
-#		except socket.error:
-#			end_time = -1
-#		file_size = f_path.split("_")[-1]
-#		up_down = "upload"
-#		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
-#	RandomFile.delete_group(f_group)
+	f_group = RandomFile.create_group(location, testid)
+	for f_path in f_group:
+		start_time = time.time()
+		try:
+			driver.upload_object(f_path, container, f_path, {"content_type": "application/octo-stream"})
+			end_time = time.time()
+		except  LibcloudError, ObjectHashMismatchError:
+			end_time = -1
+		except socket.error:
+			end_time = -1
+		file_size = f_path.split("_")[-1]
+		up_down = "upload"
+		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
+	RandomFile.delete_group(f_group)
 	
 	#test for download
 	objects = []
@@ -144,7 +144,7 @@ def test_original(driver, container_name, server):
 		roundid = string.atoi(info[1])
 		loc = info[0]
 		if cmp(loc, location) == 0 and (testid - roundid) > 10:
-			conainer.delete_object(o)
+			driver.delete_object(o)
 		#prepare to pick a group to download
 		file_size = string.atoi(info[2])
 		if file_size == 8 * 1024 * 1024:
@@ -305,9 +305,9 @@ if __name__ == "__main__":
 	
 		#TODO
 		#test for mlibcloud
-#		test_mlibcloud_3_5()
+		test_mlibcloud_3_5()
 		test_mlibcloud_3_6()
-#		test_mlibcloud_3_7()
+		test_mlibcloud_3_7()
 
 		write_checkpoint(testid)
 		
