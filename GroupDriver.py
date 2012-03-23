@@ -633,19 +633,31 @@ class GroupDriver :
 		mobj = self.integrate(mobj)
 		#delete .meta file
 		for d in mobj.driver.drivers :
-			d.delete_object(d.get_object(mobj.container_name +
+			try :
+				d.delete_object(d.get_object(mobj.container_name +
 										str(get_cloud_provider(d.__class__.name)), 
 										mobj.name+'.meta'))
+			except  LibcloudError :
+				None
 		
+		for i in range(len(mobj.driver.drivers)) :
+			print(mobj.objs[i])
+
+
 		#delete file stripes
-		print(len(mobj.driver.drivers))
-		ret = [ mobj.driver.drivers[i].delete_object(mobj.objs[i])
-				for i in range(len(mobj.driver.drivers)) ]
+		for i in range(len(mobj.driver.drivers)) :
+			try :
+				ret[i] = mobj.driver.drivers[i].delete_object(mobj.objs[i])
+			except LibcloudError :
+				ret[i] = False
 
 		for it in ret :
-			if not it :
-				return False
-		return True
+			if it :
+				return True
+
+		raise ObjectDoesNotExistError(value=None, driver=self,
+                                         object_name=mobj.name)
+		return False
 
 	def integrate(self, mobj):
 		if mobj.integrated :
@@ -686,14 +698,21 @@ def main():
 	Cloudfiles_US = get_driver(Provider.CLOUDFILES_US)
 	driver_cloudfiles_us = Cloudfiles_US("mlibcloud", "5140858194409ed2dd2ec13e008ac754")
 
-	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk])
-	driver.set_original_share(3)
-	driver.set_total_share(5)
-	driver.set_block_size(512)
-	container_name = "mlibcloud35"
-	object_name = 'Beijing_1_1048576'
-	object = driver.get_object(container_name, object_name)
-	driver.delete_object(object)
+	container_name = 'mlibcloud354'
+	object_name = 'Beijing_1_16384.3'
+	d = driver_s3_us_west
+	obj = d.get_object(container_name, object_name)
+	d.delete_object(obj)
+
+
+#	driver = GroupDriver([driver_ali, driver_azure_us, driver_google_storage, driver_s3_us_west, driver_cloudfiles_uk])
+#	driver.set_original_share(3)
+#	driver.set_total_share(5)
+#	driver.set_block_size(512)
+#	container_name = "mlibcloud35"
+#	object_name = 'Beijing_1_1048576'
+#	object = driver.get_object(container_name, object_name)
+#	driver.delete_object(object)
 
 
 
