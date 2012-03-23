@@ -639,6 +639,9 @@ class GroupDriver :
 		
 		#delete file stripes
 		print(len(mobj.driver.drivers))
+		for i in range(len(mobj.driver.drivers)) :
+				print(mobj.objs[i])
+
 		ret = [ mobj.driver.drivers[i].delete_object(mobj.objs[i])
 				for i in range(len(mobj.driver.drivers)) ]
 
@@ -691,7 +694,7 @@ def main():
 	driver.set_total_share(5)
 	driver.set_block_size(512)
 	container_name = "mlibcloud35"
-	object_name = 'Beijing_1_1048576'
+	object_name = 'Beijing_1_16384'
 	object = driver.get_object(container_name, object_name)
 	driver.delete_object(object)
 
