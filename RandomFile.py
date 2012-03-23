@@ -32,7 +32,10 @@ class RandomFile(object):
 	@staticmethod
 	def delete_group(file_group):
 		for f_path in file_group:
-			os.remove(f_path)	
+			try:
+				os.remove(f_path)	
+			except OSError:
+				None
 
 if __name__ == "__main__":
 	f_path = RandomFile.create("test_file", 16 * 1024)
