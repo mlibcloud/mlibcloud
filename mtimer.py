@@ -6,6 +6,8 @@ class mtimer :
 		self.name = name
 		self.c_name = c_name
 		self.o_name = o_name
+		self.t1 = 0.0
+		self.t2 = -1.0
 	def begin(self):
 		self.t1 = time.time()
 	def end(self):

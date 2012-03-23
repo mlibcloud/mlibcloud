@@ -144,7 +144,10 @@ def test_original(driver, container_name, server):
 		roundid = string.atoi(info[1])
 		loc = info[0]
 		if cmp(loc, location) == 0 and (testid - roundid) > 10:
-			driver.delete_object(o)
+			try:
+				driver.delete_object(o)
+			except LibcloudError, e:
+				print e
 		#prepare to pick a group to download
 		file_size = string.atoi(info[2])
 		if file_size == 8 * 1024 * 1024:

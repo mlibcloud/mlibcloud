@@ -649,6 +649,8 @@ class GroupDriver :
 		for i in range(len(mobj.driver.drivers)) :
 				print(mobj.objs[i])
 
+		ret = []
+		ret.extend([0] * len(mobj.driver.drivers))
 		for i in range(len(mobj.driver.drivers)) :
 			try :
 				ret[i] = mobj.driver.drivers[i].delete_object(mobj.objs[i])
