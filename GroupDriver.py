@@ -633,22 +633,40 @@ class GroupDriver :
 		mobj = self.integrate(mobj)
 		#delete .meta file
 		for d in mobj.driver.drivers :
-			d.delete_object(d.get_object(mobj.container_name +
+			try :
+				d.delete_object(d.get_object(mobj.container_name +
 										str(get_cloud_provider(d.__class__.name)), 
 										mobj.name+'.meta'))
+			except  LibcloudError :
+				None
 		
+		for i in range(len(mobj.driver.drivers)) :
+			print(mobj.objs[i])
+
+
 		#delete file stripes
+<<<<<<< HEAD
 		print(len(mobj.driver.drivers))
 		for i in range(len(mobj.driver.drivers)) :
 				print(mobj.objs[i])
 
 		ret = [ mobj.driver.drivers[i].delete_object(mobj.objs[i])
 				for i in range(len(mobj.driver.drivers)) ]
+=======
+		for i in range(len(mobj.driver.drivers)) :
+			try :
+				ret[i] = mobj.driver.drivers[i].delete_object(mobj.objs[i])
+			except LibcloudError :
+				ret[i] = False
+>>>>>>> 289283c9d05c4d05f95538bc59fad16e0d5c7783
 
 		for it in ret :
-			if not it :
-				return False
-		return True
+			if it :
+				return True
+
+		raise ObjectDoesNotExistError(value=None, driver=self,
+                                         object_name=mobj.name)
+		return False
 
 	def integrate(self, mobj):
 		if mobj.integrated :
