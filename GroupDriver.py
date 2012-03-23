@@ -645,20 +645,15 @@ class GroupDriver :
 
 
 		#delete file stripes
-<<<<<<< HEAD
 		print(len(mobj.driver.drivers))
 		for i in range(len(mobj.driver.drivers)) :
 				print(mobj.objs[i])
 
-		ret = [ mobj.driver.drivers[i].delete_object(mobj.objs[i])
-				for i in range(len(mobj.driver.drivers)) ]
-=======
 		for i in range(len(mobj.driver.drivers)) :
 			try :
 				ret[i] = mobj.driver.drivers[i].delete_object(mobj.objs[i])
 			except LibcloudError :
 				ret[i] = False
->>>>>>> 289283c9d05c4d05f95538bc59fad16e0d5c7783
 
 		for it in ret :
 			if it :
