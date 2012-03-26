@@ -5,12 +5,13 @@ from TestLogger import TestLogger
 import os
 from libcloud.common.types import LibcloudError
 from libcloud.storage.providers import get_driver
-from libcloud.storage.types import Provider, ContainerDoesNotExistError, ObjectHashMismatchError
+from libcloud.storage.types import Provider, ContainerDoesNotExistError, ObjectHashMismatchError, ObjectDoesNotExistError
 from libcloud.storage.drivers.atmos import AtmosError 
 from RandomFile import RandomFile
 import string
 import socket
 import random
+import ssl
 from GroupDriver import GroupDriver
 
 location = "Beijing"
@@ -175,6 +176,10 @@ def test_original(driver, container_name, server):
 			try:
 				driver.delete_object(o)
 			except LibcloudError, e:
+				print e
+			except ObjectDoesNotExistError, e:
+				print e
+			except ssl.SSLError, e:
 				print e
 		#prepare to pick a group to download
 		file_size = string.atoi(info[2])

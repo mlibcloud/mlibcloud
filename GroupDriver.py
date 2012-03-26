@@ -11,7 +11,7 @@ import threading
 import os
 import socket
 from libcloud.storage.providers import get_driver
-from libcloud.storage.types import Provider, ContainerDoesNotExistError
+from libcloud.storage.types import Provider, ContainerDoesNotExistError, ObjectDoesNotExistError
 from mtimer import mtimer
 from libcloud.storage.types import LibcloudError
 from libcloud.storage.types import InvalidContainerNameError
