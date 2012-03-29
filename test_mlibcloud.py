@@ -17,13 +17,16 @@ from GroupDriver import GroupDriver
 location = "TestLocation"
 
 def read_location():
+	location = "TestLocation"
 	try:
 		f = open("location", "r")
-		location = f.readline()
+		location = f.readline().split("\n")[0]
 	except IOError:
+		print("Location not found")
 		None
+	return location
 
-read_location()
+location = read_location()
 
 #read testid from a checkpoint file
 def read_checkpoint():
@@ -300,30 +303,30 @@ if __name__ == "__main__":
 		
 		#test for cdns
 		#test for azure cdn	
-#		test_azure_cdn()
+		test_azure_cdn()
 
 		#test for s3 cdn
-#		test_s3_cdn()
+		test_s3_cdn()
 
 		#test for original clouds
 		#test for s3_us_west()
-#		test_s3_us_west()	
-	
-		#test_s3_ap_southeast()
-		
-#		test_s3_ap_northeast()
+		test_s3_us_west()	
+   
+		test_s3_ap_southeast()
+   	
+		test_s3_ap_northeast()
 
-#		test_ali()
+		test_ali()
 
-#		test_azure_us()
+		test_azure_us()
 
-#		test_cloudfiles_us()
-		
-#		test_cloudfiles_uk()
+		test_cloudfiles_us()
+   	
+		test_cloudfiles_uk()
 
-#		test_google_storage()
+		test_google_storage()
 
-#		test_ninefold()
+		test_ninefold()
 	
 		#TODO
 		#test for mlibcloud
