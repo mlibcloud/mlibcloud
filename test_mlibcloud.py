@@ -303,35 +303,35 @@ if __name__ == "__main__":
 		
 		#test for cdns
 		#test for azure cdn	
-	#	test_azure_cdn()
+		test_azure_cdn()
 
 		#test for s3 cdn
-	#	test_s3_cdn()
+		test_s3_cdn()
 
 		#test for original clouds
 		#test for s3_us_west()
-	#	test_s3_us_west()	
+		test_s3_us_west()	
    
-	#	test_s3_ap_southeast()
+		test_s3_ap_southeast()
    	
-	#	test_s3_ap_northeast()
+		test_s3_ap_northeast()
 
-	#	test_ali()
+		test_ali()
 
-	#	test_azure_us()
+		test_azure_us()
 
-	#	test_cloudfiles_us()
+		test_cloudfiles_us()
    	
-	#	test_cloudfiles_uk()
+		test_cloudfiles_uk()
 
-	#	test_google_storage()
+		test_google_storage()
 
-	#	test_ninefold()
+		test_ninefold()
 	
 		#TODO
 		#test for mlibcloud
-	#	test_mlibcloud_3_5()
-	#	test_mlibcloud_3_6()
+		test_mlibcloud_3_5()
+		test_mlibcloud_3_6()
 		test_mlibcloud_3_7()
 
 		write_checkpoint(testid)
