@@ -227,7 +227,7 @@ def test_s3_ap_southeast():
 	test_original(driver, container_name, server)
 
 def test_s3_ap_northeast():
-	driver = driver_ap_northeast
+	driver = driver_s3_ap_northeast
 	server = "original:S3_AP_NORTHEAST"
 	container_name = "mlibclouds3apnortheast"
 	test_original(driver, container_name, server)
