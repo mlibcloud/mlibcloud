@@ -19,7 +19,7 @@ location = "TestLocation"
 def read_location():
 	try:
 		f = open("location", "r")
-		location = f.readLine()
+		location = f.readline()
 	except IOError:
 		None
 
