@@ -24,10 +24,10 @@ class TestLogger(object):
 			object.__init__(TestLogger.__instance)
 			handler = TimedRotatingFileHandler(filename = "mlibcloud.log", when='midnight')
 			handler_s = StreamHandler()
-			formatter = Formatter("%(asctime)s\t%(message)s")
+			formatter = Formatter("%(levelname)s\t%(asctime)s\t%(message)s")
 			handler.setFormatter(formatter)
 			handler_s.setFormatter(formatter)
-			TestLogger.__logger.setLevel(logging.INFO)
+			TestLogger.__logger.setLevel(logging.DEBUG)
 			TestLogger.__logger.addHandler(handler)
 			TestLogger.__logger.addHandler(handler_s);
 		TestLogger.__lock.release()
@@ -37,7 +37,7 @@ class TestLogger(object):
 		TestLogger.__logger.info("%s\t%s\t%s\t%s\t%s\t%s\t%s", test_id, location, server, start_time, end_time, file_size, up_down)
 	
 	def log_sentence(self, sentence):
-		TestLogger.__logger.info(sentence)
+		TestLogger.__logger.debug(sentence)
 
 if __name__ == "__main__":
 	test_id = 1;		#test group id count
