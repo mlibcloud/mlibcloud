@@ -14,8 +14,16 @@ import random
 import ssl
 from GroupDriver import GroupDriver
 
-location = "Beijing"
+location = "TestLocation"
 
+def read_location():
+	try:
+		f = open("location", "r")
+		location = f.readLine()
+	except IOError:
+		None
+
+read_location()
 
 #read testid from a checkpoint file
 def read_checkpoint():
@@ -139,6 +147,7 @@ def test_original(driver, container_name, server):
 		container = driver.create_container(container_name)
 	
 	#test for upload
+	up_down = "upload"
 	f_group = RandomFile.create_group(location, testid)
 	for f_path in f_group:
 		start_time = time.time()
@@ -150,80 +159,57 @@ def test_original(driver, container_name, server):
 		except socket.error:
 			end_time = -1
 		file_size = f_path.split("_")[-1]
-		up_down = "upload"
 		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
 	RandomFile.delete_group(f_group)
 	
-	#test for download
-	objects = []
-	try:
-		objects = driver.list_container_objects(container)	
-	except LibcloudError:
-		None
-		return
-	except socket.error:
-		None
-		return
+	#test for get, do not list
+	objects_to_down = []
+	up_down = "get"
+	for object_name in f_group:
+		try:
+			start_time= time.time()
+			o = driver.get_object(container_name, object_name)
+			objects_to_down.append(o)
+			end_time = time.time()
+		except LibcloudError:
+			end_time = -1
+		except socket.error:
+			end_time = -1
 
-	down_dic = {}
-	for o in objects:
-		fs_path = o.name			
-		info = fs_path.split("_")
-		#delete the object if it is generated locally 10 rounds ago
-		roundid = string.atoi(info[1])
-		loc = info[0]
-		if cmp(loc, location) == 0 and (testid - roundid) > 10:
-			try:
-				driver.delete_object(o)
-			except LibcloudError, e:
-				print e
-			except ObjectDoesNotExistError, e:
-				print e
-			except ssl.SSLError, e:
-				print e
-		#prepare to pick a group to download
-		file_size = string.atoi(info[2])
-		if file_size == 8 * 1024 * 1024:
-			if down_dic.has_key(loc) and down_dic[loc] > roundid:
-				None
-			else:
-				down_dic[loc] = roundid
+		file_size = object_name.split("_")[-1]
+		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
 
-	#prefer to download from other client uploads	
-	if len(down_dic) > 1 and down_dic.has_key(location):
-		down_dic.pop(location)
-
-	if len(down_dic) == 0:
-		print("down dic is empty!!")
-		return
-
-	#randomly pick a group to download
-	info_tuple = random.choice(down_dic.items())	
-	to_down_objects = []
-	
-	for o in objects:
-		info = o.name.split("_")
-		loc = info[0]
-		roundid = string.atoi(info[1])
-		if cmp(loc, info_tuple[0]) == 0 and roundid == info_tuple[1]:
-			to_down_objects.append(o)
-	
-	f_group = []
-	for o in to_down_objects:
+	#test for get, do not list
+	up_down = "download"
+	for o in objects_to_down:
 		start_time = time.time()
 		try:
 			f_group.append(o.name)
 			driver.download_object(o, o.name, True)
 			end_time = time.time()
-		except LibcloudError, ObjectHashMismatchError:
+		except LibcloudError:
 			end_time = -1
 		except socket.error:
 			end_time = -1
-
+		
 		file_size = string.atoi(o.name.split("_")[-1])
-		up_down = "download"
 		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
 	RandomFile.delete_group(f_group)
+
+	#delete
+	up_down = "delete"
+	for o in objects_to_down:
+		start_time = time.time()
+		try:
+			driver.delete_object(o)
+			end_time = time.time()
+		except LibcloudError:
+			end_time = -1
+		except socket.error:
+			end_time = -1
+		
+		file_size = string.atoi(o.name.split("_")[-1])
+		TestLogger.getInstance().log(testid, location, server, start_time, end_time, file_size, up_down)
 
 def test_s3_us_west():
 	driver = driver_s3_us_west
