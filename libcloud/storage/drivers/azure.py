@@ -14,7 +14,7 @@ import sys
 import os
 from xml.dom import minidom #TODO: Use a faster way of processing XML
 import re
-from urllib2 import Request, urlopen, URLError
+from urllib2 import Request, urlopen, URLError, HTTPError
 from urllib import urlencode
 from urlparse import urlsplit, parse_qs
 from datetime import datetime, timedelta
@@ -170,8 +170,11 @@ class AzureStorageDriver(StorageDriver) :
 				return container
 			else :
 				raise LibcloudError("Unexpected status code %s" % (response.status), driver = self)
+		except HTTPError ,e :
+			raise LibcloudError("Unexpected HTTPError %s " %(e.code), driver = self)
+
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.reason), driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.args), driver = self)
 
 
 	def upload_object(self, file_path, container, object_name, extra = None,
@@ -194,8 +197,13 @@ class AzureStorageDriver(StorageDriver) :
 				return obj
 			else :
 				raise LibcloudError("Unexpected status code %s" % (response.status) ,driver = self)	
+		except HTTPError ,e :
+			raise LibcloudError("Unexpected HTTPError %s " %(e.code), driver = self)
+
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.reason) ,driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.args), driver = self)
+
+
 
 	def object_exists(self, container_name, object_name):
 		req = RequestWithMethod("HEAD", "%s/%s/%s" % (self.get_base_url(), container_name, object_name))
@@ -262,8 +270,11 @@ class AzureStorageDriver(StorageDriver) :
 			else :
 				raise LibcloudError("Unexpected status code %s" % (ret.status) ,driver = self)	
 				return False
+		except HTTPError ,e :
+			raise LibcloudError("Unexpected HTTPError %s " %(e.code), driver = self)
+			return False
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.reason) ,driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.args), driver = self)
 			return False
 
 
