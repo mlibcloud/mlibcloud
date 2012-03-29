@@ -163,6 +163,8 @@ class AzureStorageDriver(StorageDriver) :
 		self._credentials.sign_request(req)
 		try:
 			response = urlopen(req)
+			print("create_container ret code :" + str(response.code))
+
 			if response.code == 201 :
 				container = Container(name = container_name, extra = None, driver = self)
 				return container
@@ -185,6 +187,8 @@ class AzureStorageDriver(StorageDriver) :
 		self._credentials.sign_request(req)
 		try:
 			response = urlopen(req)
+			print("upload_object ret code :" + str(response.code))
+
 			if response.code == 201 :
 				obj = Object(object_name, len(data), None, None, None, container, self)
 				return obj
@@ -252,6 +256,7 @@ class AzureStorageDriver(StorageDriver) :
 			req = RequestWithMethod("DELETE", "%s/%s/%s" % (self.get_base_url(), container_name, obj_name))
 			self._credentials.sign_request(req)
 			ret = urlopen(req)
+			print("delete_object ret code :" + str(ret.code))
 			if ret.code / 100 == 2:
 				return True
 			else :
