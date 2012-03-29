@@ -123,7 +123,10 @@ class GroupDriver :
 	
 	def __init__(self, driver_list):
 		self.drivers = driver_list
-		self.driver_dict = { d.__class__.name : d for d in self.drivers}
+#		self.driver_dict = { d.__class__.name : d for d in self.drivers}
+		self.driver_dict = {}
+		for d in self.drivers :
+			self.driver_dict[d.__class__.name ] = d
 		#TODO
 	
 	def set_original_share(self, k):
@@ -390,7 +393,10 @@ class GroupDriver :
 
 
 		#driver_times {driver_name : driver_time }
-		driver_times = {it.name : it.time for it in meta_threads }
+#		driver_times = {it.name : it.time for it in meta_threads }
+		driver_times = {}
+		for it in meta_threads :
+			driver_times[it.name] = it.time
 		
 		#check meta files
 		if DEBUG:
@@ -470,7 +476,11 @@ class GroupDriver :
 		m = meta['m']
 		file_size = meta["size"]
 		block_size = meta["blocksize"]
-		stripe_location = { 's' + str(i) : meta["s" + str(i)] for i in range(m) }
+#		stripe_location = { 's' + str(i) : meta["s" + str(i)] for i in range(m) }
+		stripe_location = {}
+		for i in range(m) :
+			stripe_location['s' + str(i)] =  meta["s" + str(i)]
+
 		print("read from meta complete")
 		return (k, m, file_size, block_size, stripe_location)
 

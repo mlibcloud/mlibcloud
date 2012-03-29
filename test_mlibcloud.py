@@ -154,7 +154,7 @@ def test_original(driver, container_name, server):
 		try:
 			driver.upload_object(f_path, container, f_path, {"content_type": "application/octo-stream"})
 			end_time = time.time()
-		except  LibcloudError, ObjectHashMismatchError:
+		except  LibcloudError:
 			end_time = -1
 		except socket.error:
 			end_time = -1
