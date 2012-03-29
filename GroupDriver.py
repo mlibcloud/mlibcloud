@@ -154,7 +154,7 @@ class GroupDriver :
 		for i in range(self.m) :
 			try :
 				ret[i] = self.drivers[i].create_container(container_name + container_name_suffix[i] )
-			except InvalidContainerNameError :
+			except LibcloudError :
 				ret[i] = self.drivers[i].get_container(container_name + container_name_suffix[i] )
 
 		if DEBUG:
