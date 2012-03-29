@@ -169,7 +169,7 @@ class AzureStorageDriver(StorageDriver) :
 			else :
 				raise LibcloudError("Unexpected status code %s" % (response.status), driver = self)
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.code), driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.reason), driver = self)
 
 
 	def upload_object(self, file_path, container, object_name, extra = None,
@@ -191,7 +191,7 @@ class AzureStorageDriver(StorageDriver) :
 			else :
 				raise LibcloudError("Unexpected status code %s" % (response.status) ,driver = self)	
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.code) ,driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.reason) ,driver = self)
 
 	def object_exists(self, container_name, object_name):
 		req = RequestWithMethod("HEAD", "%s/%s/%s" % (self.get_base_url(), container_name, object_name))
@@ -258,7 +258,7 @@ class AzureStorageDriver(StorageDriver) :
 				raise LibcloudError("Unexpected status code %s" % (ret.status) ,driver = self)	
 				return False
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.code) ,driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.reason) ,driver = self)
 			return False
 
 

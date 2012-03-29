@@ -45,7 +45,7 @@ class AliyunStorageDriver(OssAPI):
 			raise LibcloudError("Unexpected status code %s" % (response.status), driver = self)
 			return None
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.code), driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.reason), driver = self)
 			return None
 
 	def upload_object(self, file_path, container, object_name, extra = None,
@@ -59,7 +59,7 @@ class AliyunStorageDriver(OssAPI):
 				raise LibcloudError("Unexpected status code %s" % (res.status) ,driver = self)	
 
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.code) ,driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.reason) ,driver = self)
 
 
 	def object_exists(self, container_name, object_name):
