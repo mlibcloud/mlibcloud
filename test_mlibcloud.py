@@ -99,7 +99,7 @@ S3_AP_SOUTHEAST = get_driver(Provider.S3_AP_SOUTHEAST)
 driver_s3_ap_southeast = S3_AP_SOUTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
 
 S3_AP_NORTHEAST = get_driver(Provider.S3_AP_NORTHEAST)
-driver_s3_ap_southeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
+driver_s3_ap_northeast = S3_AP_NORTHEAST("AKIAITLX6IDDU5VTNAPA", "Pi0BhJiVan/l6a2+Yg9JVxrNvZSTRMGIx39XWAGq");
 
 Cloudfiles_UK = get_driver(Provider.CLOUDFILES_UK)
 driver_cloudfiles_uk = Cloudfiles_UK("mlibcloud0", "d544e3b4a183ba4d07777be6e6ce0b77")
