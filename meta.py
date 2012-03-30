@@ -29,7 +29,10 @@ class FileMeta(UserDict):
 		open(filename, "w").write(s)
 	
 	def load_from_string(self, s):
-		self.data = json.loads(s)	
+		try :
+			self.data = json.loads(s)	
+		except ValueError :
+			print(s)
 	
 	def load_from_file(self, filename):
 		self.load_from_string(open(filename, "r").read())
