@@ -108,14 +108,14 @@ Cloudfiles_US = get_driver(Provider.CLOUDFILES_US)
 driver_cloudfiles_us = Cloudfiles_US("mlibcloud", "5140858194409ed2dd2ec13e008ac754")
 
 #generate azure_cdn_urls
-azure_cdn_base = "http://az160243.vo.msecnd.net/mlibcloud/Beijing_0_"
+azure_cdn_base = "https://az160243.vo.msecnd.net/mlibcloud/Beijing_0_"
 size = 16 * 1024
 azure_cdn_urls=[]
 while size <= 8 * 1024 * 1024:
 	azure_cdn_urls.append("%s%s" % (azure_cdn_base, size))
 	size *= 2
 
-s3_cdn_base = "http://d1dce9m55tbjje.cloudfront.net/Beijing_0_"
+s3_cdn_base = "https://d1dce9m55tbjje.cloudfront.net/Beijing_0_"
 size = 16 * 1024
 s3_cdn_urls=[]
 while size <= 8 * 1024 * 1024:
@@ -127,7 +127,7 @@ def test_cdn(server, cdn_base, cdn_urls):
 	for url in cdn_urls:
 		start_time = time.time()
 		end_time = 0
-		code = os.system("wget %s -O tempfile --timeout=10" % url)
+		code = os.system("wget --no-check-certificate %s -O tempfile --timeout=10" % url)
 		if code == 0:
 			end_time = time.time()
 		else:
