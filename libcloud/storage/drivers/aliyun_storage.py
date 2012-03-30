@@ -1,6 +1,6 @@
 from libcloud.storage.drivers.oss_api import *
 from libcloud.storage.drivers.oss_xml_handler import *
-from urllib2 import Request, urlopen, URLError
+from urllib2 import Request, urlopen, URLError ,HTTPError
 
 from libcloud.common.base import ConnectionUserAndKey, RawResponse
 from libcloud.storage.base import Object, Container, StorageDriver
@@ -44,8 +44,11 @@ class AliyunStorageDriver(OssAPI):
 				return ret
 			raise LibcloudError("Unexpected status code %s" % (response.status), driver = self)
 			return None
+		except HTTPError ,e :
+			raise LibcloudError("Unexpected HTTPError %s " %(e.code), driver = self)
+			return None
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.code), driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.args), driver = self)
 			return None
 
 	def upload_object(self, file_path, container, object_name, extra = None,
@@ -58,8 +61,12 @@ class AliyunStorageDriver(OssAPI):
 			else :
 				raise LibcloudError("Unexpected status code %s" % (res.status) ,driver = self)	
 
+		except HTTPError ,e :
+			raise LibcloudError("Unexpected HTTPError %s " %(e.code), driver = self)
+
 		except URLError, e:
-			raise LibcloudError("Unexpected URLError %s " %(e.code) ,driver = self)
+			raise LibcloudError("Unexpected URLError %s " %(e.args), driver = self)
+
 
 
 	def object_exists(self, container_name, object_name):
